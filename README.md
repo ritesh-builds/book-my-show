@@ -16,6 +16,7 @@ A high-throughput, distributed movie ticket booking system built with **Fastify 
 | **Search Engine** | Elasticsearch 8.15 | Full-text search for movies, cinemas, and shows |
 | **Validation** | Zod | Request params, body validation, and environment safety |
 | **API Docs** | Swagger / OpenAPI | Interactive UI documentation at `/docs` |
+| **Reverse Proxy** | Nginx | Reverse proxy, anti-bot rate limiting, and gzip compression |
 | **Linter** | Oxlint | High-performance Rust-based JavaScript/TypeScript linter |
 | **Load Testing** | Grafana k6 | Performance and stress testing |
 | **Package Manager** | pnpm | Fast, disk-space-efficient package manager |

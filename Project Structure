@@ -92,12 +92,14 @@ book-my-show/
 │   └── index.ts                         # Run all seeds in order
 │
 ├── docker/
-│   ├── docker-compose.yml               # Local dev: MongoDB + Redis + Elasticsearch
+│   ├── docker-compose.yml               # Local dev: MongoDB + Redis + Elasticsearch + Nginx
 │   ├── docker-compose.prod.yml          # Prod overrides
 │   ├── mongodb/
 │   │   └── mongo-init.js                # MongoDB init script (create DB + user + indexes)
-│   └── redis/
-│       └── redis.conf                   # Custom Redis config (AOF, memory, LRU)
+│   ├── redis/
+│   │   └── redis.conf                   # Custom Redis config (AOF, memory, LRU)
+│   └── nginx/
+│       └── nginx.conf                   # Nginx reverse proxy, rate limiting, and gzip
 │
 ├── scripts/
 │   ├── seed.ts                          # npm run seed → runs seeds/index.ts
