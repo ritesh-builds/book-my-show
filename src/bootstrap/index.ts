@@ -10,10 +10,12 @@ import { connectElasticsearch } from './elasticsearch.ts';
 import { registerRoutes } from './routes.ts';
 import { setupErrorHandler } from './error-handler.ts';
 import { setupTelemetry } from './telemetry.ts';
+import { setupMetrics } from './metrics.ts';
 
 export async function bootstrap(app: FastifyInstance): Promise<void> {
-  // 1. Telemetry first (before any requests)
+  // 1. Telemetry & Metrics first (before any requests)
   setupTelemetry();
+  setupMetrics(app);
 
   // 2. Security plugins
   await setupHelmet(app);

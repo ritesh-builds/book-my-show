@@ -13,4 +13,6 @@ export default function () {
   if (res.status !== 200) {
     console.log("Fail: " + res.status);
   }
+
+  sleep(0.02);
 }
