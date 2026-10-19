@@ -6,13 +6,19 @@ import { env } from '../config/env.ts';
 type LoggerOptions = FastifyServerOptions['logger'];
 
 export function getLoggerOptions(): LoggerOptions {
+  if (env.NODE_ENV === 'production') {
+    return { level: 'info' };
+  }
+
   return {
-    level: env.NODE_ENV === 'production' ? 'info' : 'debug',
-    ...(env.NODE_ENV !== 'production' && {
-      transport: {
-        target: 'pino/file',
-        options: { destination: 1 }, // stdout
+    level: 'debug',
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        translateTime: 'HH:MM:ss',
+        ignore: 'pid,hostname',
       },
-    }),
+    },
   };
 }

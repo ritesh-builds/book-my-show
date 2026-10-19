@@ -11,7 +11,7 @@ services:
       MONGO_INITDB_DATABASE: book-my-show
     volumes:
       - mongo_data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   redis:
     image: redis:7-alpine
@@ -19,9 +19,10 @@ services:
     restart: unless-stopped
     ports:
       - '6379:6379'
-    command: redis-server --appendonly yes
-    volumes:
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes: 
       - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
 
   elasticsearch:
     image: elasticsearch:8.15.3

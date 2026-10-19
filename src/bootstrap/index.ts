@@ -3,6 +3,7 @@
 import type { FastifyInstance } from 'fastify';
 import { setupHelmet } from './helmet.ts';
 import { setupCors } from './cors.ts';
+import { setupSwagger } from './swagger.ts';
 import { connectMongoDB } from './mongodb.ts';
 import { connectRedis } from './redis.ts';
 import { connectElasticsearch } from './elasticsearch.ts';
@@ -18,7 +19,10 @@ export async function bootstrap(app: FastifyInstance): Promise<void> {
   await setupHelmet(app);
   await setupCors(app);
 
-  // 3. Infrastructure connections (non-blocking — app runs degraded if any fail)
+  // 3. Documentation (must be registered before routes)
+  await setupSwagger(app);
+
+  // 4. Infrastructure connections (non-blocking — app runs degraded if any fail)
   await connectMongoDB(app);
   await connectRedis(app);
   await connectElasticsearch(app);

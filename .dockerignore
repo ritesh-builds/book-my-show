@@ -1,0 +1,16 @@
+node_modules
+dist
+.git
+.github
+.agents
+.cursor
+test
+logs
+*.log
+.env
+.env.example
+README.md
+Project Structure
+CLAUDE.md
+pnpm-lock.yaml
+package-lock.json

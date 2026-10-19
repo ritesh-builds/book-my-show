@@ -29,6 +29,7 @@ book-my-show/
 │   │   ├── logger.ts                    # Pino logger config
 │   │   ├── cors.ts                      # CORS plugin setup
 │   │   ├── helmet.ts                    # Security headers
+│   │   ├── swagger.ts                   # OpenAPI specs + Swagger UI at /docs
 │   │   ├── mongodb.ts                   # MongoDB connect + graceful close
 │   │   ├── redis.ts                     # Redis connect + graceful close
 │   │   ├── elasticsearch.ts             # ES client connect + graceful close
@@ -93,7 +94,10 @@ book-my-show/
 ├── docker/
 │   ├── docker-compose.yml               # Local dev: MongoDB + Redis + Elasticsearch
 │   ├── docker-compose.prod.yml          # Prod overrides
-│   └── mongo-init.js                    # MongoDB init script (create DB + user)
+│   ├── mongodb/
+│   │   └── mongo-init.js                # MongoDB init script (create DB + user + indexes)
+│   └── redis/
+│       └── redis.conf                   # Custom Redis config (AOF, memory, LRU)
 │
 ├── scripts/
 │   ├── seed.ts                          # npm run seed → runs seeds/index.ts
@@ -109,9 +113,12 @@ book-my-show/
 │   └── error.log
 │
 ├── Dockerfile                           # Production Docker image
+├── .dockerignore                        # Docker build ignore rules
 ├── package.json
+├── pnpm-lock.yaml
 ├── tsconfig.json
 ├── .oxlintrc.json
+├── .env                                 # Local environment variables (gitignored)
 ├── .env.example                         # Safe template (no real values)
 ├── .gitignore
 └── README.md
