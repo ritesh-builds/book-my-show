@@ -1,0 +1,28 @@
+---
+description: Universal core rules and guardrails for all AI assistants
+globs: *
+alwaysApply: true
+---
+
+# Universal Project Rules & Guardrails
+
+Refer to [CLAUDE.md](../../CLAUDE.md) and [.agents/rules/guardrails.md](../../.agents/rules/guardrails.md) for full context.
+
+- Response language in chat: Hinglish.
+- Repository code and docs: 100% English.
+- Formatting: Short paragraphs, bullet points, tables, proper line spacing.
+- Constraints: No em-dashes. No over-explaining. Keep answers crisp and simple.
+- Mandatory Guardrails:
+  1. No command execution without explicit approval.
+  2. Absolute ban on Git commands.
+  3. No database delete / drop operations.
+  4. Zero file deletion policy.
+  5. Stay strictly inside workspace.
+  6. Plan first, execute only after user "Go".
+  7. No reading `.env` or secret credentials.
+  8. No `kill`, `pkill`, or process termination.
+  9. No package installations without approval.
+  10. No dangerous shell commands (`curl | sh`, `sudo`).
+  11. No network requests without approval.
+  12. No `docker exec` DB touches.
+  13. Audit logged in `.agents/audit.log`.

@@ -1,0 +1,181 @@
+# BookMyShow — Complete Project Structure
+
+## Tech Stack
+| Layer | Choice |
+|-------|--------|
+| Runtime | Node.js 22+ (LTS) |
+| Framework | Fastify v5 |
+| Language | TypeScript 7 (Go-based compiler) |
+| Validation | Zod |
+| Database | MongoDB |
+| Cache | Redis |
+| Search | Elasticsearch |
+| Linter | Oxlint |
+| Auth | JWT |
+
+---
+
+## Full Folder Tree
+
+```
+book-my-show/
+│
+├── src/
+│   ├── server.ts                        # Entry point — starts Fastify, calls bootstrap
+│   ├── app.ts                           # App factory — creates Fastify instance
+│   │
+│   ├── bootstrap/                       # Startup lifecycle (connect, register, configure)
+│   │   ├── index.ts                     # Calls all bootstraps in correct order
+│   │   ├── logger.ts                    # Pino logger config
+│   │   ├── cors.ts                      # CORS plugin setup
+│   │   ├── helmet.ts                    # Security headers
+│   │   ├── mongodb.ts                   # MongoDB connect + graceful close
+│   │   ├── redis.ts                     # Redis connect + graceful close
+│   │   ├── elasticsearch.ts             # ES client connect + graceful close
+│   │   ├── routes.ts                    # Register all module routes
+│   │   ├── error-handler.ts             # Global error response handler
+│   │   └── telemetry.ts                 # Placeholder (OpenTelemetry baad mein)
+│   │
+│   ├── config/
+│   │   └── env.ts                       # Zod-validated env vars (PORT, HOST, MONGODB_URI, REDIS_URL, ES_URL, JWT_SECRET, CORS_ORIGINS)
+│   │
+│   ├── lib/                             # Infrastructure client singletons
+│   │   ├── mongodb.client.ts            # Mongoose connection export
+│   │   ├── redis.client.ts              # ioredis client export
+│   │   └── elastic.client.ts            # @elastic/elasticsearch client export
+│   │
+│   ├── integrations/                    # Third-party service wrappers
+│   │   ├── index.ts                     # Re-exports all integrations
+│   │   ├── messaging/
+│   │   │   ├── email.ts                 # Nodemailer / SendGrid wrapper
+│   │   │   └── whatsapp.ts              # WhatsApp Business API wrapper
+│   │   ├── auth/
+│   │   │   └── jwt.ts                   # JWT sign, verify, refresh helpers
+│   │   └── payments/
+│   │       └── razorpay.ts              # Razorpay wrapper (future)
+│   │
+│   ├── modules/                         # Feature modules (domain-driven)
+│   │   │
+│   │   ├── cities/
+│   │   │   ├── cities.types.ts          # TS interfaces: City, CityId, etc.
+│   │   │   ├── cities.schema.ts         # Zod schemas: request + response validation
+│   │   │   ├── cities.repository.ts     # Data access: MongoDB queries (in-memory now)
+│   │   │   ├── cities.cache.ts          # Redis: cache get/set for cities list
+│   │   │   ├── cities.service.ts        # Business logic: calls repo + cache
+│   │   │   └── cities.routes.ts         # Fastify handlers: GET /cities, GET /cities/:id
+│   │   │
+│   │   ├── cinemas/
+│   │   │   ├── cinemas.types.ts
+│   │   │   ├── cinemas.schema.ts
+│   │   │   ├── cinemas.repository.ts
+│   │   │   ├── cinemas.cache.ts         # Redis: cinema list by city
+│   │   │   ├── cinemas.service.ts
+│   │   │   └── cinemas.routes.ts        # GET /cities/:cityId/cinemas, GET /cinemas/:id
+│   │   │
+│   │   └── shows/
+│   │       ├── shows.types.ts
+│   │       ├── shows.schema.ts
+│   │       ├── shows.repository.ts
+│   │       ├── shows.search.ts          # Elasticsearch: full-text show/movie search
+│   │       ├── shows.service.ts
+│   │       └── shows.routes.ts          # GET /cinemas/:cinemaId/shows, GET /shows/:id
+│   │
+│   └── shared/                          # Cross-module shared code
+│       ├── errors.ts                    # AppError, NotFoundError, ValidationError classes
+│       └── types.ts                     # Global types: ApiResponse<T>, PaginatedResult<T>
+│
+├── seeds/                               # Standalone seed data folder
+│   ├── cities.seed.ts                   # Seed: Mumbai, Delhi, Bangalore, Pune, Chennai
+│   ├── cinemas.seed.ts                  # Seed: 2-3 cinemas per city
+│   ├── shows.seed.ts                    # Seed: shows with movie, timing, screen
+│   └── index.ts                         # Run all seeds in order
+│
+├── docker/
+│   ├── docker-compose.yml               # Local dev: MongoDB + Redis + Elasticsearch
+│   ├── docker-compose.prod.yml          # Prod overrides
+│   └── mongo-init.js                    # MongoDB init script (create DB + user)
+│
+├── scripts/
+│   ├── seed.ts                          # npm run seed → runs seeds/index.ts
+│   ├── health-check.ts                  # Quick server alive check
+│   └── generate-module.ts               # Future: scaffold new module boilerplate
+│
+├── test/
+│   ├── health.test.ts                   # GET /health smoke test
+│   └── cities.test.ts                   # Cities API unit + integration tests
+│
+├── logs/                                # Auto-generated at runtime (gitignored)
+│   ├── app.log
+│   └── error.log
+│
+├── Dockerfile                           # Production Docker image
+├── package.json
+├── tsconfig.json
+├── .oxlintrc.json
+├── .env.example                         # Safe template (no real values)
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Data Flow per Request
+
+```
+HTTP Request
+    │
+    ▼
+routes.ts (Fastify handler)
+    │  validates via Zod schema
+    ▼
+service.ts (business logic)
+    │  checks cache first
+    ▼
+cache.ts ──── HIT ──▶ return cached data
+    │
+   MISS
+    │
+    ▼
+repository.ts (data access)
+    │  queries MongoDB / in-memory
+    ▼
+service.ts (format response)
+    │  sets cache
+    ▼
+HTTP Response (via shared/types.ts ApiResponse<T>)
+```
+
+---
+
+## API Endpoints (Phase 1)
+
+| Method | Endpoint | Module |
+|--------|----------|--------|
+| GET | `/health` | bootstrap |
+| GET | `/api/v1/cities` | cities |
+| GET | `/api/v1/cities/:id` | cities |
+| GET | `/api/v1/cities/:cityId/cinemas` | cinemas |
+| GET | `/api/v1/cinemas/:id` | cinemas |
+| GET | `/api/v1/cinemas/:cinemaId/shows` | shows |
+| GET | `/api/v1/shows/:id` | shows |
+
+---
+
+## package.json Scripts
+
+```json
+{
+  "dev":          "node --watch --experimental-strip-types src/server.ts",
+  "start":        "node --experimental-strip-types src/server.ts",
+  "typecheck":    "tsc --noEmit",
+  "lint":         "oxlint src/",
+  "test":         "node --experimental-strip-types --test test/**/*.test.ts",
+  "seed":         "node --experimental-strip-types scripts/seed.ts",
+  "docker:up":    "docker compose -f docker/docker-compose.yml up -d",
+  "docker:down":  "docker compose -f docker/docker-compose.yml down"
+}
+```
+
+---
+
+> **"Go"** bolo to sab files ek saath create karta hoon.

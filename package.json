@@ -1,0 +1,39 @@
+{
+  "name": "book-my-show",
+  "version": "1.0.0",
+  "description": "BookMyShow System Design — Fastify + TypeScript 7",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --experimental-strip-types src/server.ts",
+    "start": "node --experimental-strip-types src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "esbuild src/server.ts --bundle --platform=node --outfile=dist/server.js --external:mongoose --external:ioredis --external:@elastic/elasticsearch",
+    "lint": "oxlint src/",
+    "test": "node --experimental-strip-types --test test/**/*.test.ts",
+    "seed": "node --experimental-strip-types scripts/seed.ts",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d",
+    "docker:down": "docker compose -f docker/docker-compose.yml down"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.15.0",
+    "@fastify/cors": "^10.0.0",
+    "@fastify/helmet": "^13.0.0",
+    "fastify": "^5.0.0",
+    "ioredis": "^5.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.0",
+    "nodemailer": "^6.9.16",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.0.0",
+    "@types/nodemailer": "^6.4.17",
+    "esbuild": "^0.24.0",
+    "oxlint": "^0.16.0",
+    "typescript": "latest"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  }
+}

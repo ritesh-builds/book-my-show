@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json.schemastore.org/partial-config.json",
+  "version": "2.0",
+  "name": "project-guardrail-hooks",
+  "description": "Comprehensive lifecycle hooks and interceptors for all AI agents",
+  "audit": {
+    "enabled": true,
+    "log_file": ".agents/audit.log",
+    "log_events": ["blocked_command", "blocked_file_access", "permission_denied"]
+  },
+  "interceptors": {
+    "command_execution": {
+      "blocked_patterns": [
+        "^git\\s+.*",
+        ".*\\b(rm|del|Remove-Item|unlink)\\b.*",
+        ".*\\b(drop\\s+database|drop\\s+table|truncate|delete\\s+from)\\b.*",
+        ".*\\b(kill|pkill|taskkill)\\b.*",
+        ".*\\b(sudo|runas|chmod\\s+-R|chown\\s+-R)\\b.*",
+        ".*\\|\\s*(sh|bash|powershell|cmd).*",
+        ".*\\b(docker\\s+exec|kubectl\\s+exec)\\b.*"
+      ],
+      "approval_required_patterns": [
+        ".*\\b(npm\\s+install|yarn\\s+add|pnpm\\s+add|pip\\s+install)\\b.*",
+        ".*\\b(curl|wget|Invoke-WebRequest|Invoke-RestMethod)\\b.*"
+      ],
+      "action_on_match": "block_and_alert",
+      "reason": "Operation intercepted by project security guardrails (.agents/rules/guardrails.md)"
+    },
+    "file_operations": {
+      "forbidden_actions": [
+        "delete_file",
+        "delete_dir"
+      ],
+      "protected_file_patterns": [
+        "\\.env.*",
+        ".*\\.pem$",
+        ".*\\.key$",
+        ".*credentials.*",
+        ".*id_rsa.*"
+      ],
+      "path_restrictions": {
+        "allowed_root": "c:\\Programming\\System Design\\book-my-show",
+        "block_traversal": true
+      }
+    },
+    "workflow_gates": {
+      "require_plan_approval": true,
+      "approval_keywords": ["go", "approved", "proceed"]
+    }
+  }
+}

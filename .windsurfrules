@@ -1,0 +1,21 @@
+# Universal Rules for Windsurf
+
+Refer to [CLAUDE.md](CLAUDE.md) and [.agents/rules/guardrails.md](.agents/rules/guardrails.md) for complete guidelines.
+
+## Instructions & Guardrails
+- Chat responses: Hinglish, short paragraphs, bullet points, tables, no em-dashes.
+- Repository code and docs: 100% English.
+- Tone: Crisp, direct, no unnecessary background or over-explanation.
+- Mandatory Guardrails:
+  1. No Git execution (add, commit, push, etc.).
+  2. No file deletion.
+  3. No database delete / drop operations.
+  4. Always present plan first and wait for approval.
+  5. Confined strictly to project folder.
+  6. No reading `.env` or secrets.
+  7. No process termination (`kill`, `pkill`).
+  8. No package install without permission.
+  9. No dangerous shell commands (`curl | sh`, `sudo`).
+  10. No unapproved network requests.
+  11. No `docker exec` DB touches.
+  12. Audit logged in `.agents/audit.log`.

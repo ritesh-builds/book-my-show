@@ -1,0 +1,19 @@
+# Universal Agent Rules for Cursor
+
+Always refer to [CLAUDE.md](CLAUDE.md) and [.agents/rules/guardrails.md](.agents/rules/guardrails.md) as the source of truth.
+
+## Core Directives & Guardrails
+- Chat responses: Hinglish, short paragraphs, bullet points, tables, no em-dashes.
+- Repo code and documentation: 100% English.
+- Execution: Plan first, require explicit "Go".
+- Hard bans:
+  - No Git commands.
+  - No file deletions.
+  - No destructive DB operations.
+  - No reading `.env` or secrets.
+  - No `kill`, `pkill`, or process restarts.
+  - No `npm/pip install` without permission.
+  - No dangerous shell patterns (`curl | sh`, `sudo`, `chmod -R`).
+  - No network calls (`curl`, `wget`) without permission.
+  - No `docker exec` DB access.
+- Audit: Check [.agents/audit.log](.agents/audit.log).
