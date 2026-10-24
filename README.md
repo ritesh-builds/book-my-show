@@ -16,7 +16,6 @@ A high-throughput, distributed movie ticket booking system built with **Fastify 
 | **Search Engine** | Elasticsearch 8.15 | Full-text search for movies, cinemas, and shows |
 | **Validation** | Zod | Request params, body validation, and environment safety |
 | **API Docs** | Swagger / OpenAPI | Interactive UI documentation at `/docs` |
-| **Reverse Proxy** | Nginx | Reverse proxy, anti-bot rate limiting, and gzip compression |
 | **Linter** | Oxlint | High-performance Rust-based JavaScript/TypeScript linter |
 | **Load Testing** | Grafana k6 | Performance and stress testing |
 | **Package Manager** | pnpm | Fast, disk-space-efficient package manager |
@@ -145,9 +144,21 @@ Interactive Swagger documentation is available out of the box:
 Load testing scripts are written using [k6](https://k6.io/):
 
 ```powershell
-# Run API load test (50 VUs, 45 seconds)
+# Run API load test (200 VUs, 15 seconds)
 k6 run scripts/load-testing/1.api-test.js
 ```
+
+### Benchmark & Concurrency Scaling (Cities API)
+
+Benchmarked on local machine (Fastify v5 + Node.js 22 + Redis cache-aside) across concurrency levels:
+
+| Concurrent VUs | Total Requests | Throughput (RPS) | Success Rate | Avg Latency | p95 Latency | Data Transfer |
+|---|---|---|---|---|---|---|
+| **200 VUs** | 110,129 | 7,330 req/s | **100.00%** (0 fails) | **6.59 ms** | 19.13 ms | 137 MB |
+| **300 VUs** | 105,903 | 7,023 req/s | **100.00%** (0 fails) | **22.01 ms** | 51.70 ms | 132 MB |
+| **400 VUs** | **118,502** | **7,883 req/s** | **99.90%** (121 fails) | **30.08 ms** | 52.64 ms | **147 MB** |
+
+> **Key Takeaway**: Up to 300 concurrent VUs, the single-process Fastify server delivers 100% success rate with sub-25ms average latency. At 400 VUs, peak throughput scales to ~7,900 req/s.
 
 ---
 
