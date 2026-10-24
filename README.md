@@ -102,12 +102,17 @@ The server will listen at `localhost:3000`.
 
 ---
 
-## API Documentation
+## API Documentation & Observability
 
-Interactive Swagger documentation is available out of the box:
+Interactive documentation, metrics, and real-time observability dashboards:
 
-* **Swagger UI**: [http://localhost:3000/docs](http://localhost:3000/docs)
-* **OpenAPI JSON**: [http://localhost:3000/docs/json](http://localhost:3000/docs/json)
+| Service / Interface | URL | Description / Credentials |
+|---|---|---|
+| **Swagger UI** | [http://localhost:3000/docs](http://localhost:3000/docs) | Interactive API exploration and testing |
+| **OpenAPI JSON** | [http://localhost:3000/docs/json](http://localhost:3000/docs/json) | Raw OpenAPI schema definition |
+| **Prometheus Metrics** | [http://localhost:3000/metrics](http://localhost:3000/metrics) | Fastify runtime & HTTP Prometheus metrics |
+| **Prometheus UI** | [http://localhost:9090](http://localhost:9090) | Time-series query interface & target health |
+| **Grafana Dashboard** | [http://localhost:3001](http://localhost:3001) | Real-time monitoring dashboards (`admin` / `admin`) |
 
 ### Key Endpoints
 
