@@ -152,13 +152,25 @@ k6 run scripts/load-testing/1.api-test.js
 
 Benchmarked on local machine (Fastify v5 + Node.js 22 + Redis cache-aside) across concurrency levels:
 
+#### Single Core Scaling (Direct Fastify)
+
 | Concurrent VUs | Total Requests | Throughput (RPS) | Success Rate | Avg Latency | p95 Latency | Data Transfer |
 |---|---|---|---|---|---|---|
 | **200 VUs** | 110,129 | 7,330 req/s | **100.00%** (0 fails) | **6.59 ms** | 19.13 ms | 137 MB |
 | **300 VUs** | 105,903 | 7,023 req/s | **100.00%** (0 fails) | **22.01 ms** | 51.70 ms | 132 MB |
 | **400 VUs** | **118,502** | **7,883 req/s** | **99.90%** (121 fails) | **30.08 ms** | 52.64 ms | **147 MB** |
 
-> **Key Takeaway**: Up to 300 concurrent VUs, the single-process Fastify server delivers 100% success rate with sub-25ms average latency. At 400 VUs, peak throughput scales to ~7,900 req/s.
+#### Single Core vs PM2 4-Core Cluster (300 VUs, 15s)
+
+| Architecture | Total Requests | Throughput (RPS) | Avg Latency | p50 (Median) | p95 Latency | Success Rate |
+|---|---|---|---|---|---|---|
+| **Single Core (Node.js)** | 105,903 | 7,023 req/s | 22.01 ms | 17.75 ms | 51.70 ms | **100.00%** |
+| **PM2 4-Core Cluster** | **134,749** | **8,955 req/s** | **10.87 ms** | **7.57 ms** | **29.63 ms** | **99.97%** |
+
+> **Key Takeaways**:
+> * **Cluster Throughput Boost**: 4-Core cluster scales throughput to ~9,000 req/s (+27.5% over single core).
+> * **50% Latency Reduction**: Average latency drops from 22.01 ms to 10.87 ms, with p50 median at just 7.57 ms.
+> * **Sustained Scale**: Under a 30-second sustained stress test, PM2 cluster processed over **253,000 requests** delivering 315 MB data.
 
 ---
 
