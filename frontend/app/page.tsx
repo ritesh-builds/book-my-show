@@ -153,7 +153,7 @@ export default function HomePage() {
 
       {/* 2. Hero Movie Spotlight Banner */}
       {heroShow && (
-        <section className="relative w-full h-[400px] sm:h-[460px] overflow-hidden bg-black flex items-center">
+        <section className="relative w-full h-[360px] sm:h-[420px] md:h-[460px] overflow-hidden bg-black flex items-center">
           {/* Background Poster Image */}
           <div
             className="absolute inset-0 bg-cover bg-center opacity-40 dark:opacity-35 scale-105 transition-transform duration-1000"
@@ -278,7 +278,7 @@ export default function HomePage() {
           </div>
 
           {/* Movie Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {filteredMovies.map((movie) => {
               const primaryShow = movie.shows[0];
 

@@ -146,8 +146,8 @@ export default function CheckoutBar() {
       )}
 
       {/* Floating Bottom Action Dock */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#090b10]/95 backdrop-blur-2xl border-t border-slate-200 dark:border-zinc-800/90 shadow-[0_-8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.8)] transition-colors">
-        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#090b10]/95 backdrop-blur-2xl border-t border-slate-200 dark:border-zinc-800/90 shadow-[0_-8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.8)] pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-colors">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
           {/* Lock Conflict Error Alert */}
           {lockError && (
             <div className="mb-3 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-500/40 text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between">

@@ -47,19 +47,24 @@ export default function SeatGrid() {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-7 select-none my-4">
+    <div className="w-full max-w-3xl mx-auto space-y-5 sm:space-y-7 select-none my-3 sm:my-4 px-1 sm:px-0">
+      {/* Mobile Swipe Hint Badge */}
+      <div className="flex sm:hidden items-center justify-center gap-1.5 py-1 px-3 rounded-full bg-slate-200/70 dark:bg-zinc-800/70 border border-slate-300 dark:border-zinc-700/60 text-[10px] font-mono text-slate-600 dark:text-zinc-400 mx-auto w-fit">
+        <span>← Swipe to explore full row →</span>
+      </div>
+
       {tiers.map((tier) => {
         const IconComponent = tier.icon;
 
         return (
           <div
             key={tier.title}
-            className="rounded-2xl p-4 sm:p-5 bg-white dark:bg-[#0f1117]/80 border border-slate-200 dark:border-zinc-800/70 shadow-sm dark:shadow-lg backdrop-blur-sm transition-colors"
+            className="rounded-2xl p-3.5 sm:p-5 bg-white dark:bg-[#0f1117]/80 border border-slate-200 dark:border-zinc-800/70 shadow-sm dark:shadow-lg backdrop-blur-sm transition-colors"
           >
             {/* Tier Header with Price & Badge */}
-            <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-slate-100 dark:border-zinc-800/60">
+            <div className="flex items-center justify-between pb-2.5 sm:pb-3.5 mb-2.5 sm:mb-3 border-b border-slate-100 dark:border-zinc-800/60">
               <div className="flex items-center gap-2">
-                {IconComponent && <IconComponent className="h-4 w-4 text-amber-500 dark:text-amber-400" />}
+                {IconComponent && <IconComponent className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500 dark:text-amber-400" />}
                 <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white tracking-wide">
                   {tier.title}
                 </span>
@@ -68,69 +73,70 @@ export default function SeatGrid() {
                 </span>
               </div>
               <span
-                className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${tier.badgeColor}`}
+                className={`text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-full border ${tier.badgeColor}`}
               >
                 {tier.badge}
               </span>
             </div>
 
-            {/* Rows Container */}
-            <div className="space-y-2.5">
-              {tier.rows.map((rowName) => {
-                const rowSeats = seats.filter((s) => s.row === rowName);
+            {/* Rows Container with Horizontal Touch-Pan */}
+            <div className="overflow-x-auto touch-pan-x scrollbar-none pb-1 sm:pb-0 -mx-1 px-1">
+              <div className="min-w-[310px] sm:min-w-0 space-y-2 sm:space-y-2.5">
+                {tier.rows.map((rowName) => {
+                  const rowSeats = seats.filter((s) => s.row === rowName);
 
-                return (
-                  <div
-                    key={rowName}
-                    className="flex items-center justify-between gap-1 sm:gap-3"
-                  >
-                    {/* Left Row Indicator */}
-                    <span className="w-5 text-center text-xs font-mono font-bold text-zinc-500 shrink-0">
-                      {rowName}
-                    </span>
+                  return (
+                    <div
+                      key={rowName}
+                      className="flex items-center justify-between gap-1 sm:gap-3"
+                    >
+                      {/* Left Row Indicator */}
+                      <span className="w-4 sm:w-5 text-center text-[10px] sm:text-xs font-mono font-bold text-zinc-500 shrink-0">
+                        {rowName}
+                      </span>
 
-                    {/* Seats with Center Aisle */}
-                    <div className="flex items-center justify-center gap-1 sm:gap-2 flex-1">
-                      {rowSeats.map((seat, index) => {
-                        const isSelected = selectedSeats.includes(seat.seatNumber);
-                        const isUserLocked = lockedSeats.includes(seat.seatNumber);
-                        const isExternalLocked =
-                          seat.status === 'LOCKED' && !isUserLocked;
-                        const isBooked = seat.status === 'BOOKED';
+                      {/* Seats with Center Aisle */}
+                      <div className="flex items-center justify-center gap-1 sm:gap-2 flex-1">
+                        {rowSeats.map((seat, index) => {
+                          const isSelected = selectedSeats.includes(seat.seatNumber);
+                          const isUserLocked = lockedSeats.includes(seat.seatNumber);
+                          const isExternalLocked =
+                            seat.status === 'LOCKED' && !isUserLocked;
+                          const isBooked = seat.status === 'BOOKED';
 
-                        // Advanced Theater Seat Styling with Tactile Bounce
-                        let containerClasses =
-                          'bg-slate-100 dark:bg-[#191c24] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700/70 hover:border-rose-400 dark:hover:border-rose-400 hover:bg-slate-200 dark:hover:bg-[#232733] hover:scale-115 active:scale-90 cursor-pointer';
-                        let seatContent: React.ReactNode = seat.number;
+                          // Advanced Theater Seat Styling with Tactile Bounce
+                          let containerClasses =
+                            'bg-slate-100 dark:bg-[#191c24] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700/70 hover:border-rose-400 dark:hover:border-rose-400 hover:bg-slate-200 dark:hover:bg-[#232733] hover:scale-110 active:scale-90 cursor-pointer';
+                          let seatContent: React.ReactNode = seat.number;
 
-                        if (isBooked) {
-                          containerClasses =
-                            'bg-slate-100 dark:bg-zinc-900/60 text-slate-300 dark:text-zinc-700 border-slate-200 dark:border-zinc-900/40 cursor-not-allowed opacity-45';
-                          seatContent = '✕';
-                        } else if (isExternalLocked) {
-                          containerClasses =
-                            'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400/90 border-amber-300 dark:border-amber-500/40 cursor-not-allowed opacity-85';
-                        } else if (isSelected || isUserLocked) {
-                          containerClasses =
-                            'bg-rose-600 text-white font-bold border-rose-400 seat-selected-glow scale-110 ring-2 ring-rose-400/60 shadow-lg shadow-rose-600/40';
-                        }
+                          if (isBooked) {
+                            containerClasses =
+                              'bg-slate-100 dark:bg-zinc-900/60 text-slate-300 dark:text-zinc-700 border-slate-200 dark:border-zinc-900/40 cursor-not-allowed opacity-45';
+                            seatContent = '✕';
+                          } else if (isExternalLocked) {
+                            containerClasses =
+                              'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400/90 border-amber-300 dark:border-amber-500/40 cursor-not-allowed opacity-85';
+                          } else if (isSelected || isUserLocked) {
+                            containerClasses =
+                              'bg-rose-600 text-white font-bold border-rose-400 seat-selected-glow scale-105 ring-2 ring-rose-400/60 shadow-lg shadow-rose-600/40';
+                          }
 
-                        return (
-                          <React.Fragment key={seat.seatNumber}>
-                            {/* Visual Center Walkway Aisle (after Seat 5) */}
-                            {index === 5 && (
-                              <div className="w-4 sm:w-8 h-8 flex items-center justify-center shrink-0">
-                                <div className="w-[1px] h-4 bg-zinc-800" />
-                              </div>
-                            )}
+                          return (
+                            <React.Fragment key={seat.seatNumber}>
+                              {/* Visual Center Walkway Aisle (after Seat 5) */}
+                              {index === 5 && (
+                                <div className="w-2 sm:w-6 md:w-8 h-7 sm:h-8 flex items-center justify-center shrink-0">
+                                  <div className="w-[1px] h-3.5 sm:h-4 bg-zinc-700/60" />
+                                </div>
+                              )}
 
-                            <button
-                              type="button"
-                              onClick={() => handleSeatClick(seat)}
-                              disabled={isBooked || isExternalLocked}
-                              title={`${seat.seatNumber} — ₹${seat.price} (${seat.status})`}
-                              className={`group relative h-8 w-7 sm:h-9 sm:w-8 rounded-t-lg rounded-b-md border text-[11px] font-mono flex flex-col items-center justify-center transition-all duration-200 shadow-sm ${containerClasses}`}
-                            >
+                              <button
+                                type="button"
+                                onClick={() => handleSeatClick(seat)}
+                                disabled={isBooked || isExternalLocked}
+                                title={`${seat.seatNumber} — ₹${seat.price} (${seat.status})`}
+                                className={`group relative h-7.5 w-6 sm:h-8.5 sm:w-7 md:h-9 md:w-8 rounded-t-lg rounded-b-md border text-[9px] sm:text-[10px] md:text-[11px] font-mono flex flex-col items-center justify-center transition-all duration-150 shadow-sm shrink-0 ${containerClasses}`}
+                              >
                               {/* Recliner Top Headrest Curve Visual */}
                               <div
                                 className={`w-3/4 h-1 rounded-full mb-0.5 ${
@@ -161,6 +167,7 @@ export default function SeatGrid() {
                   </div>
                 );
               })}
+              </div>
             </div>
           </div>
         );

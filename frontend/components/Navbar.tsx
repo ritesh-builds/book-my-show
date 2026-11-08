@@ -108,13 +108,13 @@ export default function Navbar({
   return (
     <>
       <nav className="border-b bg-white/95 dark:bg-[#0c0e14]/90 border-slate-200 dark:border-zinc-800/80 backdrop-blur-xl sticky top-0 z-40 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16 gap-3">
+        <div className="max-w-7xl mx-auto px-2.5 sm:px-6">
+          <div className="flex items-center justify-between h-15 sm:h-16 gap-2 sm:gap-3">
             
             {/* 1. Left: Brand Logo */}
-            <Link href="/" className="flex items-center gap-3 shrink-0 group">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-rose-600 via-rose-500 to-amber-500 p-[1px] shadow-md shadow-rose-900/20 group-hover:scale-105 transition-transform">
-                <div className="h-full w-full bg-white dark:bg-[#0c0e14] rounded-[11px] flex items-center justify-center font-black tracking-tight text-rose-600 dark:text-white text-base">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 group">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-tr from-rose-600 via-rose-500 to-amber-500 p-[1px] shadow-md shadow-rose-900/20 group-hover:scale-105 transition-transform">
+                <div className="h-full w-full bg-white dark:bg-[#0c0e14] rounded-[11px] flex items-center justify-center font-black tracking-tight text-rose-600 dark:text-white text-sm sm:text-base">
                   BM
                 </div>
               </div>
@@ -141,17 +141,17 @@ export default function Navbar({
             </div>
 
             {/* 3. Right: City Selector Pill + Redis Badge + Theme Toggle */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               {/* City Pill Button that opens CityModal */}
               <button
                 type="button"
                 onClick={() => setIsCityModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-800 dark:text-zinc-200 hover:border-rose-500 dark:hover:border-rose-500 cursor-pointer shadow-sm transition-all active:scale-95"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl text-[11px] sm:text-xs font-semibold bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-800 dark:text-zinc-200 hover:border-rose-500 dark:hover:border-rose-500 cursor-pointer shadow-sm transition-all active:scale-95"
                 title="Change city or detect live location"
               >
-                <MapPin className="h-3.5 w-3.5 text-rose-600 shrink-0" />
-                <span className="max-w-[110px] sm:max-w-[140px] truncate">{displayCityName}</span>
-                <ChevronDown className="h-3 w-3 text-slate-400 dark:text-zinc-500 shrink-0" />
+                <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-rose-600 shrink-0" />
+                <span className="max-w-[80px] xs:max-w-[110px] sm:max-w-[140px] truncate">{displayCityName}</span>
+                <ChevronDown className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-slate-400 dark:text-zinc-500 shrink-0" />
               </button>
 
               {/* Redis Status Pill */}
