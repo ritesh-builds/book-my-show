@@ -3,7 +3,7 @@
 import type { FastifyServerOptions } from 'fastify';
 import { env } from '../config/env.ts';
 
-type LoggerOptions = FastifyServerOptions['logger'];
+type LoggerOptions = NonNullable<FastifyServerOptions['logger']>;
 
 export function getLoggerOptions(): LoggerOptions {
   if (env.NODE_ENV === 'production') {

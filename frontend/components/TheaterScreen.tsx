@@ -8,10 +8,10 @@ export default function TheaterScreen() {
   return (
     <div className="w-full flex flex-col items-center justify-center pt-2 pb-6 select-none relative overflow-hidden">
       {/* 1. Projector Light Cone Beam casting down */}
-      <div className="projector-beam w-full max-w-2xl h-24 absolute top-0 pointer-events-none" />
+      <div className="projector-beam w-full max-w-2xl h-24 absolute top-0 pointer-events-none animate-projector" />
 
       {/* 2. Ambient glow behind the screen */}
-      <div className="w-3/4 max-w-xl h-10 bg-gradient-to-b from-rose-500/20 via-sky-500/10 to-transparent blur-xl pointer-events-none -mb-3" />
+      <div className="w-3/4 max-w-xl h-10 bg-gradient-to-b from-rose-500/25 via-sky-500/15 to-transparent blur-xl pointer-events-none -mb-3 animate-pulse" />
 
       {/* 3. Curved Screen Bar */}
       <div className="relative w-full max-w-xl flex flex-col items-center px-4">

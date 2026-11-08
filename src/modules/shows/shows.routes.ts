@@ -30,9 +30,19 @@ const showsRoutes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /api/v1/shows — List all shows
-  fastify.get('/shows', async (_request, reply): Promise<ApiResponse<Show[]>> => {
-    const data = await showsService.getAll();
+  // GET /api/v1/shows — List all shows or top 25 hot-tier shows from Redis
+  fastify.get<{ Querystring: { trending?: string } }>(
+    '/shows',
+    async (request, reply): Promise<ApiResponse<Show[]>> => {
+      const isTrending = request.query.trending === 'true' || request.query.trending === '1';
+      const data = await showsService.getAll(isTrending);
+      return reply.send({ success: true, data });
+    },
+  );
+
+  // GET /api/v1/shows/trending — Direct shortcut for Redis-cached top 25 hot tier
+  fastify.get('/shows/trending', async (_request, reply): Promise<ApiResponse<Show[]>> => {
+    const data = await showsService.getHotTrendingShows();
     return reply.send({ success: true, data });
   });
 

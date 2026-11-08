@@ -1,4 +1,4 @@
-// app/page.tsx — BookMyShow Official Homepage Experience
+  // app/page.tsx — BookMyShow Official Homepage Experience with Dynamic City Filtering
 
 'use client';
 
@@ -16,9 +16,12 @@ import {
   Zap,
   ShieldCheck,
   CheckCircle2,
+  Building2,
+  Search,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import { fetchShows, fetchCinemasByCity } from '../lib/api';
+import { fetchShows, fetchCinemasByCity, fetchCities } from '../lib/api';
+import { getMovieMetadata, CINEMA_NAMES } from '../lib/movieMetadata';
 
 interface Show {
   id: string;
@@ -33,109 +36,33 @@ interface Show {
   price: number;
   availableSeats: number;
   totalSeats: number;
+  isHot?: boolean;
 }
 
-// Movie metadata with posters and genres
-const MOVIE_POSTERS: Record<string, { poster: string; backdrop: string; genre: string; rating: string; votes: string }> = {
-  'Kalki 2898 AD': {
-    poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=600&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop',
-    genre: 'Sci-Fi / Action / Epic',
-    rating: '8.9',
-    votes: '240K',
-  },
-  'Pushpa 2': {
-    poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1600&auto=format&fit=crop',
-    genre: 'Action / Thriller / Drama',
-    rating: '8.7',
-    votes: '190K',
-  },
-  'Animal': {
-    poster: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=600&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1600&auto=format&fit=crop',
-    genre: 'Crime / Drama / Action',
-    rating: '8.3',
-    votes: '150K',
-  },
-  'Dunki': {
-    poster: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=600&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=1600&auto=format&fit=crop',
-    genre: 'Comedy / Drama / Adventure',
-    rating: '7.9',
-    votes: '95K',
-  },
-  'Salaar': {
-    poster: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1600&auto=format&fit=crop',
-    genre: 'Action / Crime / Thriller',
-    rating: '8.1',
-    votes: '110K',
-  },
-  'Vettaiyan': {
-    poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=600&auto=format&fit=crop',
-    backdrop: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1600&auto=format&fit=crop',
-    genre: 'Action / Drama',
-    rating: '8.0',
-    votes: '80K',
-  },
-};
+interface Cinema {
+  id: string;
+  name: string;
+  cityId: string;
+  address: string;
+  screens: number;
+}
 
-const DEFAULT_POSTER = {
-  poster: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=600&auto=format&fit=crop',
-  backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop',
-  genre: 'Feature Film / Drama',
-  rating: '8.5',
-  votes: '100K',
-};
-
-const CINEMA_NAMES: Record<string, string> = {
-  cn1: 'PVR Juhu, Mumbai',
-  cn2: 'INOX Nariman Point, Mumbai',
-  cn3: 'PVR Select Citywalk, Delhi',
-  cn4: 'Cinepolis Ambience Mall, Delhi',
-  cn5: 'PVR Orion Mall, Bengaluru',
-  cn6: 'INOX Garuda Mall, Bengaluru',
-  cn7: 'PVR Seasons Mall, Pune',
-  cn8: 'Cinepolis Westend Mall, Pune',
-  cn9: 'Sathyam Cinemas, Chennai',
-  cn10: 'PVR VR Mall, Chennai',
-  cn11: 'Prasads IMAX, Hyderabad',
-  cn12: 'PVR Inorbit Mall, Hyderabad',
-  cn13: 'INOX Quest Mall, Kolkata',
-  cn14: 'PVR Mani Square, Kolkata',
-  cn15: 'PVR Acropolis Mall, Ahmedabad',
-  cn_ggn_1: 'PVR Ambience Mall, Gurugram',
-  cn_ggn_2: 'Cinepolis DLF Mega Mall, Gurugram',
-  cn_fbd_1: 'INOX Crown Interiorz, Faridabad',
-  cn_fbd_2: 'PVR SRS Cinemas, Faridabad',
-  cn_pnp_1: 'Cinepolis Mittal Mega Mall, Panipat',
-  cn_amb_1: 'PVR Galaxy Mall, Ambala',
-  cn_rtk_1: 'PVR Sheetal Mall, Rohtak',
-  cn_knl_1: 'MovieMax Kessel Mall, Karnal',
-  cn_snp_1: 'Miraj Cinemas, Sonipat',
-  cn_pkl_1: 'PVR Shalimar Mega Mall, Panchkula',
-  cn_chd_1: 'PVR Elante Mall, Chandigarh',
-  cn_chd_2: 'Cinepolis Jagat Mall, Chandigarh',
-  cn_jpr_1: 'Raj Mandir Cinema, Jaipur',
-  cn_lko_1: 'PVR Phoenix Palassio, Lucknow',
-  cn_pat_1: 'Cinepolis P&M Mall, Patna',
-  cn_bpl_1: 'Cinepolis DB City Mall, Bhopal',
-  cn_koc_1: 'PVR Lulu Mall, Kochi',
-  cn_ind_1: 'INOX Treasure Island, Indore',
-  cn_noi_1: 'PVR Superplex Mall of India, Noida',
-  cn_ldh_1: 'PVR Pavilion Mall, Ludhiana',
-  cn_asr_1: 'Cinepolis Mall of Amritsar',
-};
+interface City {
+  id: string;
+  name: string;
+  state: string;
+}
 
 export default function HomePage() {
   const [shows, setShows] = useState<Show[]>([]);
-  const [selectedCity, setSelectedCity] = useState('c1');
-  const [cityCinemas, setCityCinemas] = useState<any[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [selectedCity, setSelectedCity] = useState('c_hr_karnal'); // Defaults to Karnal if no cache
+  const [cityCinemas, setCityCinemas] = useState<Cinema[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState('ALL');
+  const [activeFilter, setActiveFilter] = useState('HOT');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Restore cached city on mount
+  // 1. Restore cached city from localStorage or default to Karnal
   useEffect(() => {
     const saved = localStorage.getItem('bms_selected_city');
     if (saved) {
@@ -143,22 +70,21 @@ export default function HomePage() {
     }
   }, []);
 
-  // Load shows and cinemas for the selected city
+  // 2. Fetch shows, cities, and cinemas for selected city
   useEffect(() => {
     async function loadData() {
       try {
-        const [showsData, cinemasData] = await Promise.all([
+        const [showsData, cinemasData, citiesData] = await Promise.all([
           fetchShows(),
           fetchCinemasByCity(selectedCity).catch(() => []),
+          fetchCities().catch(() => []),
         ]);
-        if (Array.isArray(showsData)) {
-          setShows(showsData);
-        }
-        if (Array.isArray(cinemasData)) {
-          setCityCinemas(cinemasData);
-        }
+
+        if (Array.isArray(showsData)) setShows(showsData);
+        if (Array.isArray(cinemasData)) setCityCinemas(cinemasData);
+        if (Array.isArray(citiesData)) setCities(citiesData);
       } catch (err) {
-        console.warn('Could not load shows or cinemas:', err);
+        console.warn('Could not load homepage data:', err);
       } finally {
         setLoading(false);
       }
@@ -166,28 +92,59 @@ export default function HomePage() {
     loadData();
   }, [selectedCity]);
 
-  // Unique movies list from seeded shows
+  // Current City Object
+  const currentCityObj = cities.find((c) => c.id === selectedCity);
+  const currentCityName = currentCityObj ? currentCityObj.name : 'Your City';
+
+  // Find shows matching this city's multiplexes
+  const cityCinemaIds = cityCinemas.map((c) => c.id);
+  const localShows = shows.filter((s) => cityCinemaIds.includes(s.cinemaId));
+
+  // If local shows exist, use them; otherwise show all shows
+  const activeShows = localShows.length > 0 ? localShows : shows;
+
+  // Unique movies list from seeded shows (100 movies total)
   const uniqueMovies = Array.from(new Set(shows.map((s) => s.movie))).map((title) => {
-    const movieShows = shows.filter((s) => s.movie === title);
-    const meta = MOVIE_POSTERS[title] || DEFAULT_POSTER;
+    // Check if this movie has showtimes in the selected city
+    const movieLocalShows = localShows.filter((s) => s.movie === title);
+    const movieAllShows = shows.filter((s) => s.movie === title);
+    const displayShows = movieLocalShows.length > 0 ? movieLocalShows : movieAllShows;
+    const meta = getMovieMetadata(title);
+    const isHot = movieAllShows.some((s) => s.isHot);
+
     return {
       title,
-      shows: movieShows,
+      shows: displayShows,
+      hasLocalShows: movieLocalShows.length > 0,
+      isHot,
       ...meta,
     };
   });
 
-  // Filter movies by category pill
+  // Filter movies by category pill and search query
   const filteredMovies = uniqueMovies.filter((m) => {
-    if (activeFilter === 'ALL') return true;
+    // 1. Search Query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchTitle = m.title.toLowerCase().includes(q);
+      const matchGenre = m.genre.toLowerCase().includes(q);
+      const matchFormat = m.shows.some((s) => s.format.toLowerCase().includes(q));
+      const matchLang = m.shows.some((s) => s.language.toLowerCase().includes(q));
+      if (!matchTitle && !matchGenre && !matchFormat && !matchLang) return false;
+    }
+
+    // 2. Category Filter
+    if (activeFilter === 'HOT') return m.isHot;
     if (activeFilter === 'IMAX') return m.shows.some((s) => s.format.includes('IMAX'));
     if (activeFilter === 'ACTION') return m.genre.includes('Action');
     if (activeFilter === 'DRAMA') return m.genre.includes('Drama');
+    if (activeFilter === 'PUNJABI') return m.shows.some((s) => s.language === 'Punjabi');
     return true;
   });
 
-  const heroShow = shows[0];
-  const heroMeta = heroShow ? (MOVIE_POSTERS[heroShow.movie] || DEFAULT_POSTER) : DEFAULT_POSTER;
+  // Hero Spotlight Movie (prioritizes local show)
+  const heroShow = activeShows[0] || shows[0];
+  const heroMeta = heroShow ? getMovieMetadata(heroShow.movie) : getMovieMetadata('Kalki 2898 AD');
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#08090c] text-slate-900 dark:text-zinc-100 flex flex-col selection:bg-rose-500 selection:text-white transition-colors">
@@ -213,7 +170,7 @@ export default function HomePage() {
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-2.5 py-1 rounded-full bg-rose-600 text-white font-bold text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-md shadow-rose-600/30">
                   <Sparkles className="h-3 w-3" />
-                  Trending #1 in Theaters
+                  Now Showing in {currentCityName}
                 </span>
                 <span className="px-2.5 py-1 rounded-full bg-white/10 dark:bg-zinc-800/80 backdrop-blur-md text-white font-mono text-xs border border-white/20">
                   {heroShow.format}
@@ -244,12 +201,12 @@ export default function HomePage() {
                   className="px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl shadow-rose-600/30 transition-all hover:scale-105 active:scale-95"
                 >
                   <Ticket className="h-4 w-4" />
-                  <span>Book Tickets</span>
+                  <span>Book Seats ({heroShow.startTime})</span>
                 </Link>
 
-                <div className="flex items-center gap-2 text-xs font-mono text-zinc-400 px-3 py-2 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
+                <div className="flex items-center gap-2 text-xs font-mono text-zinc-300 px-3 py-2 rounded-xl bg-black/50 border border-white/10 backdrop-blur-md">
                   <Clock className="h-3.5 w-3.5 text-rose-400" />
-                  <span>Next Show: {heroShow.startTime} ({CINEMA_NAMES[heroShow.cinemaId] || 'PVR'})</span>
+                  <span>{CINEMA_NAMES[heroShow.cinemaId] || 'Multiplex'}</span>
                 </div>
               </div>
             </div>
@@ -262,38 +219,61 @@ export default function HomePage() {
         
         {/* Recommended Movies Section */}
         <section className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                <Film className="h-5 w-5 text-rose-600" />
-                Recommended Movies
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-                Top rated blockbusters running across IMAX and premium screens
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <Film className="h-5 w-5 text-rose-600" />
+                  Recommended Movies in {currentCityName}
+                </h2>
+                <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50">
+                  {filteredMovies.length} Titles
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 flex items-center gap-1.5">
+                <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500 inline" />
+                <span>Top 25 Hot-Tier blockbusters cached in Redis RAM • Full 100-movie catalog</span>
               </p>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              {[
-                { label: 'All Movies', id: 'ALL' },
-                { label: 'IMAX 3D', id: 'IMAX' },
-                { label: 'Action', id: 'ACTION' },
-                { label: 'Drama', id: 'DRAMA' },
-              ].map((filter) => (
-                <button
-                  key={filter.id}
-                  type="button"
-                  onClick={() => setActiveFilter(filter.id)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium font-mono whitespace-nowrap transition-all cursor-pointer ${
-                    activeFilter === filter.id
-                      ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
-                      : 'bg-white dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700'
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
+            {/* Search & Filter Controls */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              {/* Instant Search Bar */}
+              <div className="relative min-w-[220px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search 100 movies..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-1.5 rounded-full text-xs bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100 border border-slate-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-500 placeholder:text-slate-400 dark:placeholder:text-zinc-500 shadow-sm"
+                />
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                {[
+                  { label: '🔥 Top 25 Hot (Redis)', id: 'HOT' },
+                  { label: 'All 100 Movies', id: 'ALL' },
+                  { label: 'IMAX 3D', id: 'IMAX' },
+                  { label: 'Action', id: 'ACTION' },
+                  { label: 'Drama', id: 'DRAMA' },
+                  { label: 'Punjabi', id: 'PUNJABI' },
+                ].map((filter) => (
+                  <button
+                    key={filter.id}
+                    type="button"
+                    onClick={() => setActiveFilter(filter.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium font-mono whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer ${
+                      activeFilter === filter.id
+                        ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 scale-105'
+                        : 'bg-white dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 hover:scale-102'
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -305,23 +285,31 @@ export default function HomePage() {
               return (
                 <div
                   key={movie.title}
-                  className="group rounded-2xl overflow-hidden bg-white dark:bg-[#0f1118] border border-slate-200 dark:border-zinc-800/80 shadow-md hover:shadow-xl dark:shadow-none hover:border-slate-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between"
+                  className="group rounded-2xl overflow-hidden bg-white dark:bg-[#0f1118] border border-slate-200 dark:border-zinc-800/80 shadow-md hover:shadow-2xl hover:shadow-rose-500/10 dark:shadow-none hover:border-rose-500/40 dark:hover:border-rose-500/40 card-hover-lift flex flex-col justify-between transition-all"
                 >
                   {/* Poster Thumbnail */}
                   <div className="relative h-64 w-full overflow-hidden bg-slate-900">
                     <div
-                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
+                      className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-700 ease-out"
                       style={{ backgroundImage: `url(${movie.poster})` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent group-hover:opacity-90 transition-opacity" />
 
                     {/* Format Badge */}
                     <span className="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-white font-mono text-[10px] font-semibold border border-white/20">
                       {primaryShow?.format || '2D'}
                     </span>
 
+                    {/* Hot Tier Redis Badge */}
+                    {movie.isHot && (
+                      <span className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-rose-600/95 backdrop-blur-md text-white font-mono text-[10px] font-bold flex items-center gap-1 border border-rose-400/40 animate-pulse-bloom">
+                        <Zap className="h-2.5 w-2.5 fill-current" />
+                        Redis Hot
+                      </span>
+                    )}
+
                     {/* Rating Badge */}
-                    <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-white text-xs font-semibold border border-white/10">
+                    <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md text-white text-xs font-semibold border border-white/10 group-hover:border-rose-500/40 transition-colors">
                       <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                       <span>{movie.rating}/10</span>
                       <span className="text-[10px] text-zinc-400 font-mono">({movie.votes})</span>
@@ -341,15 +329,18 @@ export default function HomePage() {
 
                     {/* Showtimes & Booking Link */}
                     <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/80 space-y-2">
-                      <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 uppercase tracking-wider block">
-                        Available Showtimes
-                      </span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 uppercase tracking-wider block">
+                          Showtimes ({CINEMA_NAMES[primaryShow?.cinemaId] || 'Theater'})
+                        </span>
+                      </div>
+
                       <div className="flex items-center gap-1.5 flex-wrap">
                         {movie.shows.slice(0, 3).map((showItem) => (
                           <Link
                             key={showItem.id}
                             href={`/book/${showItem.id}`}
-                            className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-semibold bg-slate-100 dark:bg-zinc-800/80 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700/60 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white hover:border-rose-600 transition-all cursor-pointer"
+                            className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-semibold bg-slate-100 dark:bg-zinc-800/80 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700/60 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white hover:border-rose-600 transition-all cursor-pointer shadow-sm"
                           >
                             {showItem.startTime}
                           </Link>
@@ -358,9 +349,9 @@ export default function HomePage() {
 
                       <Link
                         href={`/book/${primaryShow?.id || 's1'}`}
-                        className="w-full mt-2 py-2 rounded-xl bg-slate-900 dark:bg-zinc-800 text-white dark:text-zinc-200 hover:bg-rose-600 dark:hover:bg-rose-600 text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
+                        className="w-full mt-2 py-2 rounded-xl bg-slate-900 dark:bg-zinc-800 text-white dark:text-zinc-200 hover:bg-rose-600 dark:hover:bg-rose-600 text-xs font-semibold flex items-center justify-center gap-1 transition-colors cursor-pointer"
                       >
-                        <span>Select Seats</span>
+                        <span>Reserve Seats</span>
                         <ChevronRight className="h-3.5 w-3.5" />
                       </Link>
                     </div>
@@ -371,7 +362,78 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 4. System Design & Concurrency Benchmark Banner */}
+        {/* 4. Multiplexes in Selected City Section */}
+        {cityCinemas.length > 0 && (
+          <section className="space-y-4 p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#0c0e14] border border-slate-200 dark:border-zinc-800/80 shadow-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Building2 className="h-5 w-5 text-rose-600" />
+                  Cinemas & Multiplexes in {currentCityName}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                  Real-time seat availability across screens
+                </p>
+              </div>
+              <span className="text-xs font-mono px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-semibold border border-slate-200 dark:border-zinc-700">
+                {cityCinemas.length} Theaters Active
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              {cityCinemas.map((cinema) => {
+                const cinemaShows = shows.filter((s) => s.cinemaId === cinema.id);
+
+                return (
+                  <div
+                    key={cinema.id}
+                    className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 flex flex-col justify-between space-y-3"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                          {cinema.name}
+                        </h4>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          {cinema.screens} Screens
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                        {cinema.address}
+                      </p>
+                    </div>
+
+                    {/* Shows in this cinema */}
+                    <div className="pt-2 border-t border-slate-200 dark:border-zinc-800/80">
+                      <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 uppercase block mb-1.5">
+                        Running Shows:
+                      </span>
+                      {cinemaShows.length > 0 ? (
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {cinemaShows.map((s) => (
+                            <Link
+                              key={s.id}
+                              href={`/book/${s.id}`}
+                              className="px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 hover:border-rose-600 hover:text-rose-600 transition-colors cursor-pointer shadow-sm"
+                            >
+                              {s.movie} ({s.startTime})
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400 dark:text-zinc-500 font-mono">
+                          Next shows scheduling shortly
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* 5. System Design & Concurrency Benchmark Banner */}
         <section className="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-900 via-zinc-900 to-black text-white border border-zinc-800 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -410,7 +472,7 @@ export default function HomePage() {
             {/* Direct Link to Seat Concurrency Simulator */}
             <div className="shrink-0 flex flex-col items-start lg:items-end gap-3">
               <Link
-                href="/book/s1"
+                href="/book/s_knl_1"
                 className="px-6 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl shadow-rose-600/30 transition-all hover:scale-105 active:scale-95"
               >
                 <Zap className="h-4 w-4 fill-white" />
@@ -425,7 +487,7 @@ export default function HomePage() {
 
       </main>
 
-      {/* 5. Minimalist Footer */}
+      {/* 6. Minimalist Footer */}
       <footer className="border-t bg-white dark:bg-[#06070a] border-slate-200 dark:border-zinc-800/80 py-8 px-4 sm:px-6 transition-colors">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-zinc-500 font-mono">
           <div className="flex items-center gap-2">

@@ -146,6 +146,28 @@ export const bookingsService = {
   },
 
   /**
+   * Release / Unlock temporarily locked seats from Redis.
+   */
+  async unlockSeats(input: { showId: string; seatNumbers: string[]; userId: string }): Promise<{ success: boolean; releasedSeats: string[]; message: string }> {
+    const { showId, seatNumbers } = input;
+
+    // Verify show exists
+    const show = showsRepository.findById(showId);
+    if (!show) {
+      throw new NotFoundError(`Show with id '${showId}'`);
+    }
+
+    // Release locks from Redis
+    await seatLockManager.releaseSeats(showId, seatNumbers);
+
+    return {
+      success: true,
+      releasedSeats: seatNumbers,
+      message: `${seatNumbers.length} seat(s) released successfully from Redis lock.`,
+    };
+  },
+
+  /**
    * Confirm booking: verifies payment, releases Redis lock, writes to DB, dispatches ticket.
    */
   async confirmBooking(input: ConfirmBookingInput): Promise<Booking> {

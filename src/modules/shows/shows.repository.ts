@@ -9,9 +9,9 @@ const shows: Show[] = showsSeed.map(s => ({
 }));
 
 export interface ShowFilters {
-  date?: string;
-  language?: string;
-  format?: string;
+  date?: string | undefined;
+  language?: string | undefined;
+  format?: string | undefined;
 }
 
 export const showsRepository = {

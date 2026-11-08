@@ -5,6 +5,7 @@ import citiesRoutes from '../modules/cities/cities.routes.ts';
 import cinemasRoutes from '../modules/cinemas/cinemas.routes.ts';
 import showsRoutes from '../modules/shows/shows.routes.ts';
 import bookingsRoutes from '../modules/bookings/bookings.routes.ts';
+import authRoutes from '../modules/auth/auth.routes.ts';
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
   // Health check
@@ -17,6 +18,7 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
   });
 
   // API v1
+  await app.register(authRoutes, { prefix: '/api/v1' });
   await app.register(citiesRoutes, { prefix: '/api/v1' });
   await app.register(cinemasRoutes, { prefix: '/api/v1' });
   await app.register(showsRoutes, { prefix: '/api/v1' });

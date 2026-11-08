@@ -5,11 +5,12 @@ import { getLoggerOptions } from './bootstrap/logger.ts';
 import { bootstrap } from './bootstrap/index.ts';
 
 export async function buildApp() {
+  const logger = getLoggerOptions();
   const app = Fastify({
-    logger: getLoggerOptions(),
+    logger,
   });
 
-  await bootstrap(app);
+  await bootstrap(app as any);
 
   return app;
 }

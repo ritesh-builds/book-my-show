@@ -15,7 +15,7 @@ import CountdownBanner from '../../../components/CountdownBanner';
 import ConcurrencySimulator from '../../../components/ConcurrencySimulator';
 import CheckoutBar from '../../../components/CheckoutBar';
 import { useAppDispatch, useAppSelector } from '../../../store';
-import { setSeatMap, selectShow } from '../../../store/seatSlice';
+import { setSeatMap, selectShow, restoreActiveLock } from '../../../store/seatSlice';
 import { fetchSeatMap, fetchShowDetails } from '../../../lib/api';
 
 function BookingContent() {
@@ -28,6 +28,33 @@ function BookingContent() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 1. Restore cached active lock session on page mount or refresh
+  useEffect(() => {
+    try {
+      const savedLock = localStorage.getItem('bms_active_lock');
+      if (savedLock) {
+        const parsed = JSON.parse(savedLock);
+        if (parsed.showId === showId && Array.isArray(parsed.lockedSeats) && parsed.expiresAt) {
+          const remainingSeconds = Math.floor((new Date(parsed.expiresAt).getTime() - Date.now()) / 1000);
+          if (remainingSeconds > 0) {
+            dispatch(
+              restoreActiveLock({
+                showId,
+                lockedSeats: parsed.lockedSeats,
+                expiresAt: parsed.expiresAt,
+                remainingSeconds,
+              }),
+            );
+          } else {
+            localStorage.removeItem('bms_active_lock');
+          }
+        }
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }, [showId, dispatch]);
 
   const cinemaNames: Record<string, string> = {
     cn1: 'PVR Juhu, Mumbai',

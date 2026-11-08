@@ -1,9 +1,33 @@
-// seeds/cities.seed.ts — Comprehensive India Cities Seed: Haryana, State Capitals, UTs & Major Metros
+// seeds/cities.seed.ts — Complete Indian Cities Dataset (All 22 Haryana Districts, 28 State Capitals, 8 UTs & Metros)
 
 import type { City } from '../src/modules/cities/cities.types.ts';
 
 export const citiesSeed: Omit<City, 'createdAt'>[] = [
-  // 1. Tier-1 Metros
+  // 1. Haryana (All 22 Districts & Major Commercial Cities)
+  { id: 'c_hr_karnal', name: 'Karnal', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_gurugram', name: 'Gurugram', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_faridabad', name: 'Faridabad', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_panipat', name: 'Panipat', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_ambala', name: 'Ambala', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_rohtak', name: 'Rohtak', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_hisar', name: 'Hisar', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_sonipat', name: 'Sonipat', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_panchkula', name: 'Panchkula', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_kurukshetra', name: 'Kurukshetra', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_yamunanagar', name: 'Yamunanagar', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_sirsa', name: 'Sirsa', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_bhiwani', name: 'Bhiwani', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_bahadurgarh', name: 'Bahadurgarh', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_rewari', name: 'Rewari', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_jind', name: 'Jind', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_kaithal', name: 'Kaithal', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_palwal', name: 'Palwal', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_fatehabad', name: 'Fatehabad', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_jhajjar', name: 'Jhajjar', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_narnaul', name: 'Narnaul', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_dadri', name: 'Charkhi Dadri', state: 'Haryana', country: 'India', isActive: true },
+
+  // 2. Tier-1 Metros
   { id: 'c1', name: 'Mumbai', state: 'Maharashtra', country: 'India', isActive: true },
   { id: 'c2', name: 'Delhi NCR', state: 'Delhi', country: 'India', isActive: true },
   { id: 'c3', name: 'Bengaluru', state: 'Karnataka', country: 'India', isActive: true },
@@ -13,24 +37,7 @@ export const citiesSeed: Omit<City, 'createdAt'>[] = [
   { id: 'c7', name: 'Kolkata', state: 'West Bengal', country: 'India', isActive: true },
   { id: 'c8', name: 'Ahmedabad', state: 'Gujarat', country: 'India', isActive: true },
 
-  // 2. Haryana (Comprehensive Coverage)
-  { id: 'c_hr_gurugram', name: 'Gurugram', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_faridabad', name: 'Faridabad', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_panipat', name: 'Panipat', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_ambala', name: 'Ambala', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_rohtak', name: 'Rohtak', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_hisar', name: 'Hisar', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_karnal', name: 'Karnal', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_sonipat', name: 'Sonipat', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_panchkula', name: 'Panchkula', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_yamunanagar', name: 'Yamunanagar', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_kurukshetra', name: 'Kurukshetra', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_sirsa', name: 'Sirsa', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_bhiwani', name: 'Bhiwani', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_bahadurgarh', name: 'Bahadurgarh', state: 'Haryana', country: 'India', isActive: true },
-  { id: 'c_hr_rewari', name: 'Rewari', state: 'Haryana', country: 'India', isActive: true },
-
-  // 3. All State Capitals (28 States)
+  // 3. All 28 State Capitals
   { id: 'c_cap_ap', name: 'Amaravati', state: 'Andhra Pradesh', country: 'India', isActive: true },
   { id: 'c_cap_ar', name: 'Itanagar', state: 'Arunachal Pradesh', country: 'India', isActive: true },
   { id: 'c_cap_as', name: 'Guwahati / Dispur', state: 'Assam', country: 'India', isActive: true },
@@ -53,7 +60,7 @@ export const citiesSeed: Omit<City, 'createdAt'>[] = [
   { id: 'c_cap_up', name: 'Lucknow', state: 'Uttar Pradesh', country: 'India', isActive: true },
   { id: 'c_cap_uk', name: 'Dehradun', state: 'Uttarakhand', country: 'India', isActive: true },
 
-  // 4. All Union Territories (8 UTs)
+  // 4. All 8 Union Territories
   { id: 'c_ut_ch', name: 'Chandigarh', state: 'Chandigarh', country: 'India', isActive: true },
   { id: 'c_ut_jk_s', name: 'Srinagar', state: 'Jammu & Kashmir', country: 'India', isActive: true },
   { id: 'c_ut_jk_j', name: 'Jammu', state: 'Jammu & Kashmir', country: 'India', isActive: true },

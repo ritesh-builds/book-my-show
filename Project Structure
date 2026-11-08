@@ -104,7 +104,8 @@ book-my-show/
 │   │   ├── book/[showId]/page.tsx       # Dedicated cinema seat booking & concurrency test lab
 │   │   └── StoreProvider.tsx            # Redux Provider client wrapper
 │   ├── components/
-│   │   ├── Navbar.tsx                   # Top navigation with city selector, search, theme switch
+│   │   ├── Navbar.tsx                   # Top navigation with city pill, search, theme switch
+│   │   ├── CityModal.tsx                # BookMyShow city selector modal with live GPS & search
 │   │   ├── ThemeToggle.tsx              # Sun / Moon theme toggle (Obsidian Dark & Clean Light)
 │   │   ├── Header.tsx                   # Topbar with movie metadata and dynamic show switcher
 │   │   ├── TheaterScreen.tsx            # Minimal curved IMAX screen graphic with ambient light beam
@@ -118,7 +119,8 @@ book-my-show/
 │   │   ├── seatSlice.ts                 # Seat selection, lock TTL, and optimistic updates
 │   │   └── types.ts                     # Frontend domain types
 │   ├── lib/
-│   │   └── api.ts                       # Fetch client for Fastify v5 booking endpoints
+│   │   ├── api.ts                       # Fetch client for Fastify v5 booking endpoints
+│   │   └── location.ts                  # Hybrid browser GPS & IP geolocation service
 │   ├── package.json
 │   ├── tsconfig.json
 │   └── next.config.ts

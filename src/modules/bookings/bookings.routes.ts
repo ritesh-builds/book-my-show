@@ -54,6 +54,36 @@ const bookingsRoutes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
+  // POST /api/v1/shows/:showId/unlock — Release Atomic Distributed Seat Lock
+  fastify.post<{ Params: { showId: string }; Body: { seatNumbers: string[]; userId: string } }>(
+    '/shows/:showId/unlock',
+    async (request, reply): Promise<ApiResponse<{ success: boolean; releasedSeats: string[]; message: string }>> => {
+      const paramsResult = SeatParamsSchema.safeParse(request.params);
+      if (!paramsResult.success) {
+        return reply.status(400).send({
+          success: false,
+          error: paramsResult.error.errors[0]?.message ?? 'Invalid showId parameter',
+        });
+      }
+
+      const bodyResult = LockSeatsBodySchema.safeParse(request.body);
+      if (!bodyResult.success) {
+        return reply.status(400).send({
+          success: false,
+          error: bodyResult.error.errors[0]?.message ?? 'Invalid unlock request body',
+        });
+      }
+
+      const data = await bookingsService.unlockSeats({
+        showId: paramsResult.data.showId,
+        seatNumbers: bodyResult.data.seatNumbers,
+        userId: bodyResult.data.userId,
+      });
+
+      return reply.status(200).send({ success: true, data });
+    },
+  );
+
   // POST /api/v1/bookings/confirm — Verify Payment & Finalize Booking
   fastify.post<{
     Body: {

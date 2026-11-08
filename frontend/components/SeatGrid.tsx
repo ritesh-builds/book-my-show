@@ -98,21 +98,21 @@ export default function SeatGrid() {
                           seat.status === 'LOCKED' && !isUserLocked;
                         const isBooked = seat.status === 'BOOKED';
 
-                        // Advanced Theater Seat Styling
+                        // Advanced Theater Seat Styling with Tactile Bounce
                         let containerClasses =
-                          'bg-slate-100 dark:bg-[#191c24] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700/70 hover:border-slate-400 dark:hover:border-zinc-400 hover:bg-slate-200 dark:hover:bg-[#232733] hover:scale-105 active:scale-95';
+                          'bg-slate-100 dark:bg-[#191c24] text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700/70 hover:border-rose-400 dark:hover:border-rose-400 hover:bg-slate-200 dark:hover:bg-[#232733] hover:scale-115 active:scale-90 cursor-pointer';
                         let seatContent: React.ReactNode = seat.number;
 
                         if (isBooked) {
                           containerClasses =
-                            'bg-slate-100 dark:bg-zinc-900/60 text-slate-300 dark:text-zinc-700 border-slate-200 dark:border-zinc-900/40 cursor-not-allowed opacity-50';
+                            'bg-slate-100 dark:bg-zinc-900/60 text-slate-300 dark:text-zinc-700 border-slate-200 dark:border-zinc-900/40 cursor-not-allowed opacity-45';
                           seatContent = '✕';
                         } else if (isExternalLocked) {
                           containerClasses =
                             'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400/90 border-amber-300 dark:border-amber-500/40 cursor-not-allowed opacity-85';
                         } else if (isSelected || isUserLocked) {
                           containerClasses =
-                            'bg-rose-600 text-white font-bold border-rose-400 seat-selected-glow scale-105';
+                            'bg-rose-600 text-white font-bold border-rose-400 seat-selected-glow scale-110 ring-2 ring-rose-400/60 shadow-lg shadow-rose-600/40';
                         }
 
                         return (
@@ -129,7 +129,7 @@ export default function SeatGrid() {
                               onClick={() => handleSeatClick(seat)}
                               disabled={isBooked || isExternalLocked}
                               title={`${seat.seatNumber} — ₹${seat.price} (${seat.status})`}
-                              className={`group relative h-8 w-7 sm:h-9 sm:w-8 rounded-t-lg rounded-b-md border text-[11px] font-mono flex flex-col items-center justify-center transition-all duration-150 shadow-sm ${containerClasses}`}
+                              className={`group relative h-8 w-7 sm:h-9 sm:w-8 rounded-t-lg rounded-b-md border text-[11px] font-mono flex flex-col items-center justify-center transition-all duration-200 shadow-sm ${containerClasses}`}
                             >
                               {/* Recliner Top Headrest Curve Visual */}
                               <div

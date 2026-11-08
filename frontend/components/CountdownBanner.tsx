@@ -2,16 +2,19 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
-import { Timer, AlertTriangle, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Timer, AlertTriangle, ShieldCheck, XCircle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store';
-import { decrementTimer } from '../store/seatSlice';
+import { decrementTimer, releaseLockSuccess } from '../store/seatSlice';
+import { unlockSeatsApi } from '../lib/api';
 
 export default function CountdownBanner() {
   const dispatch = useAppDispatch();
   const lockedSeats = useAppSelector((state) => state.seat.lockedSeatNumbers);
   const remainingSeconds = useAppSelector((state) => state.seat.lockTimeRemaining);
   const show = useAppSelector((state) => state.seat.currentShow);
+  const userId = useAppSelector((state) => state.seat.userId);
+  const [isReleasing, setIsReleasing] = useState(false);
 
   useEffect(() => {
     if (lockedSeats.length === 0 || remainingSeconds <= 0) return;
@@ -22,6 +25,17 @@ export default function CountdownBanner() {
 
     return () => clearInterval(interval);
   }, [lockedSeats, remainingSeconds, dispatch]);
+
+  const handleReleaseSeats = async () => {
+    if (lockedSeats.length === 0) return;
+    setIsReleasing(true);
+    try {
+      await unlockSeatsApi(show.id, lockedSeats, userId);
+      dispatch(releaseLockSuccess());
+    } finally {
+      setIsReleasing(false);
+    }
+  };
 
   if (lockedSeats.length === 0 || remainingSeconds <= 0) {
     return null;
@@ -55,13 +69,30 @@ export default function CountdownBanner() {
           </div>
         </div>
 
-        {/* Right: Big Digital Timer */}
+        {/* Right: Big Digital Timer + Release Button */}
         <div className="flex items-center gap-3 self-end sm:self-center">
           <div className="text-right">
-            <span className="text-2xl font-black font-mono tracking-wider text-amber-400">
+            <span
+              className={`text-2xl font-black font-mono tracking-wider transition-colors ${
+                remainingSeconds < 120
+                  ? 'text-rose-500 animate-pulse font-extrabold'
+                  : 'text-amber-400'
+              }`}
+            >
               {formattedTime}
             </span>
           </div>
+
+          <button
+            type="button"
+            onClick={handleReleaseSeats}
+            disabled={isReleasing}
+            className="px-3 py-1.5 rounded-xl text-xs font-mono font-medium text-rose-300 bg-rose-950/60 border border-rose-500/50 hover:bg-rose-900/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 disabled:opacity-60 shadow-sm"
+            title="Release these locks immediately in Redis so others can book"
+          >
+            <XCircle className="h-3.5 w-3.5" />
+            <span>{isReleasing ? 'Releasing...' : 'Release'}</span>
+          </button>
         </div>
       </div>
 

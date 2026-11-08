@@ -90,7 +90,8 @@ book-my-show/
 │   │   ├── page.tsx                     # BookMyShow Homepage (hero spotlight, movie cards, benchmarks)
 │   │   └── book/[showId]/page.tsx       # Dedicated cinema seat booking & concurrency test lab
 │   ├── components/                      # Adaptive Light & Dark cinema UI components
-│   │   ├── Navbar.tsx                   # Top navigation with city selector, search, theme switch
+│   │   ├── Navbar.tsx                   # Top navigation with city pill, search, theme switch
+│   │   ├── CityModal.tsx                # BookMyShow city selector modal with live GPS & search
 │   │   ├── ThemeToggle.tsx              # Sun / Moon theme toggle (Obsidian Dark & Clean Light)
 │   │   ├── Header.tsx                   # Topbar with movie metadata and dynamic show switcher
 │   │   ├── TheaterScreen.tsx            # Minimal curved IMAX screen graphic with ambient light beam
@@ -103,7 +104,9 @@ book-my-show/
 │   │   ├── index.ts                     # Store configuration and typed hooks
 │   │   ├── seatSlice.ts                 # Seat selection, lock TTL, and optimistic updates
 │   │   └── types.ts                     # Frontend domain types
-│   └── lib/api.ts                       # Fetch client for Fastify v5 booking endpoints
+│   └── lib/                             # Utility & service clients
+│       ├── api.ts                       # Fetch client for Fastify v5 booking endpoints
+│       └── location.ts                  # Hybrid browser GPS & IP geolocation service
 ├── seeds/                               # Standalone database seed data files
 │   ├── cities.seed.ts                   # City records
 │   ├── cinemas.seed.ts                  # Multiplex data

@@ -3,9 +3,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, CheckCircle2, AlertCircle, Lock, RefreshCw, X } from 'lucide-react';
+import { ArrowRight, CheckCircle2, AlertCircle, Lock, RefreshCw, X, XCircle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store';
-import { lockSeatsApi, confirmBookingApi } from '../lib/api';
+import { lockSeatsApi, confirmBookingApi, unlockSeatsApi } from '../lib/api';
 import {
   setLocking,
   setLockSuccess,
@@ -13,6 +13,7 @@ import {
   setBookingSuccess,
   resetSelections,
   toggleSeatSelection,
+  releaseLockSuccess,
 } from '../store/seatSlice';
 
 export default function CheckoutBar() {
@@ -27,6 +28,7 @@ export default function CheckoutBar() {
   const bookingSuccess = useAppSelector((state) => state.seat.bookingSuccess);
 
   const [isConfirming, setIsConfirming] = useState(false);
+  const [isReleasing, setIsReleasing] = useState(false);
 
   // Price calculations
   const selectedSeatObjects = seats.filter((s) => selectedSeats.includes(s.seatNumber));
@@ -42,6 +44,7 @@ export default function CheckoutBar() {
     if (res.success) {
       dispatch(
         setLockSuccess({
+          showId: show.id,
           lockedSeats: res.data.lockedSeats,
           expiresAt: res.data.expiresAt,
           expiresInSeconds: res.data.expiresInSeconds,
@@ -49,6 +52,25 @@ export default function CheckoutBar() {
       );
     } else {
       dispatch(setLockError(res.error));
+    }
+  };
+
+  // Release/unlock seats immediately from Redis
+  const handleReleaseSeats = async () => {
+    if (lockedSeats.length === 0) return;
+
+    setIsReleasing(true);
+    try {
+      const res = await unlockSeatsApi(show.id, lockedSeats, userId);
+      if (res.success) {
+        dispatch(releaseLockSuccess());
+      } else {
+        dispatch(setLockError(res.error || 'Failed to release seats'));
+      }
+    } catch (err: any) {
+      dispatch(setLockError(err.message || 'Error releasing seats'));
+    } finally {
+      setIsReleasing(false);
     }
   };
 
@@ -184,24 +206,37 @@ export default function CheckoutBar() {
             {/* Right: Action Button */}
             <div className="flex items-center gap-3">
               {lockedSeats.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={handleConfirmPayment}
-                  disabled={isConfirming}
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-                >
-                  {isConfirming ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      <span>Verifying Signature...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>Pay & Confirm (₹{totalPrice})</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleReleaseSeats}
+                    disabled={isConfirming || isReleasing}
+                    className="px-4 py-3 rounded-xl bg-slate-100 dark:bg-zinc-800 text-rose-600 dark:text-rose-400 border border-slate-200 dark:border-zinc-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:border-rose-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                    title="Release these locks immediately in Redis so others can book"
+                  >
+                    <XCircle className="h-4 w-4" />
+                    <span>{isReleasing ? 'Releasing...' : 'Release'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleConfirmPayment}
+                    disabled={isConfirming || isReleasing}
+                    className="flex-1 sm:flex-initial px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                  >
+                    {isConfirming ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        <span>Verifying Signature...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span>Pay & Confirm (₹{totalPrice})</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               ) : (
                 <button
                   type="button"

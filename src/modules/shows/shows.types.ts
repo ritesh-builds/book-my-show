@@ -1,7 +1,7 @@
 // modules/shows/shows.types.ts — TypeScript interfaces for Shows module
 
 export type ShowFormat = '2D' | '3D' | '4DX' | 'IMAX' | '3D IMAX';
-export type ShowLanguage = 'Hindi' | 'English' | 'Telugu' | 'Tamil' | 'Kannada' | 'Malayalam';
+export type ShowLanguage = 'Hindi' | 'English' | 'Telugu' | 'Tamil' | 'Kannada' | 'Malayalam' | 'Punjabi';
 
 export interface Show {
   id: string;
@@ -17,6 +17,7 @@ export interface Show {
   availableSeats: number;
   totalSeats: number;
   isActive: boolean;
+  isHot?: boolean;    // Cached in Redis Hot Tier (Top 25 Zipfian blockbusters)
   createdAt: Date;
 }
 
