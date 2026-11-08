@@ -10,7 +10,7 @@ const envSchema = z.object({
   REDIS_URL: z.string().default('redis://localhost:6379'),
   ES_URL: z.string().default('http://localhost:9200'),
   JWT_SECRET: z.string().min(16).default('change-me-in-production-secret-key'),
-  CORS_ORIGINS: z.string().default('http://localhost:3000'),
+  CORS_ORIGINS: z.string().default('http://localhost:3000,http://localhost:3001,http://localhost:5173'),
 });
 
 const parsed = envSchema.safeParse(process.env);

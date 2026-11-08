@@ -1,11 +1,81 @@
-// seeds/cities.seed.ts — MongoDB seed data for cities
+// seeds/cities.seed.ts — Comprehensive India Cities Seed: Haryana, State Capitals, UTs & Major Metros
 
 import type { City } from '../src/modules/cities/cities.types.ts';
 
 export const citiesSeed: Omit<City, 'createdAt'>[] = [
-  { id: 'c1', name: 'Mumbai',    state: 'Maharashtra', country: 'India', isActive: true },
-  { id: 'c2', name: 'Delhi',     state: 'Delhi',       country: 'India', isActive: true },
-  { id: 'c3', name: 'Bangalore', state: 'Karnataka',   country: 'India', isActive: true },
-  { id: 'c4', name: 'Pune',      state: 'Maharashtra', country: 'India', isActive: true },
-  { id: 'c5', name: 'Chennai',   state: 'Tamil Nadu',  country: 'India', isActive: true },
+  // 1. Tier-1 Metros
+  { id: 'c1', name: 'Mumbai', state: 'Maharashtra', country: 'India', isActive: true },
+  { id: 'c2', name: 'Delhi NCR', state: 'Delhi', country: 'India', isActive: true },
+  { id: 'c3', name: 'Bengaluru', state: 'Karnataka', country: 'India', isActive: true },
+  { id: 'c4', name: 'Pune', state: 'Maharashtra', country: 'India', isActive: true },
+  { id: 'c5', name: 'Chennai', state: 'Tamil Nadu', country: 'India', isActive: true },
+  { id: 'c6', name: 'Hyderabad', state: 'Telangana', country: 'India', isActive: true },
+  { id: 'c7', name: 'Kolkata', state: 'West Bengal', country: 'India', isActive: true },
+  { id: 'c8', name: 'Ahmedabad', state: 'Gujarat', country: 'India', isActive: true },
+
+  // 2. Haryana (Comprehensive Coverage)
+  { id: 'c_hr_gurugram', name: 'Gurugram', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_faridabad', name: 'Faridabad', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_panipat', name: 'Panipat', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_ambala', name: 'Ambala', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_rohtak', name: 'Rohtak', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_hisar', name: 'Hisar', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_karnal', name: 'Karnal', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_sonipat', name: 'Sonipat', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_panchkula', name: 'Panchkula', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_yamunanagar', name: 'Yamunanagar', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_kurukshetra', name: 'Kurukshetra', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_sirsa', name: 'Sirsa', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_bhiwani', name: 'Bhiwani', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_bahadurgarh', name: 'Bahadurgarh', state: 'Haryana', country: 'India', isActive: true },
+  { id: 'c_hr_rewari', name: 'Rewari', state: 'Haryana', country: 'India', isActive: true },
+
+  // 3. All State Capitals (28 States)
+  { id: 'c_cap_ap', name: 'Amaravati', state: 'Andhra Pradesh', country: 'India', isActive: true },
+  { id: 'c_cap_ar', name: 'Itanagar', state: 'Arunachal Pradesh', country: 'India', isActive: true },
+  { id: 'c_cap_as', name: 'Guwahati / Dispur', state: 'Assam', country: 'India', isActive: true },
+  { id: 'c_cap_br', name: 'Patna', state: 'Bihar', country: 'India', isActive: true },
+  { id: 'c_cap_cg', name: 'Raipur', state: 'Chhattisgarh', country: 'India', isActive: true },
+  { id: 'c_cap_ga', name: 'Panaji', state: 'Goa', country: 'India', isActive: true },
+  { id: 'c_cap_gj', name: 'Gandhinagar', state: 'Gujarat', country: 'India', isActive: true },
+  { id: 'c_cap_hp', name: 'Shimla', state: 'Himachal Pradesh', country: 'India', isActive: true },
+  { id: 'c_cap_jh', name: 'Ranchi', state: 'Jharkhand', country: 'India', isActive: true },
+  { id: 'c_cap_kl', name: 'Thiruvananthapuram', state: 'Kerala', country: 'India', isActive: true },
+  { id: 'c_cap_mp', name: 'Bhopal', state: 'Madhya Pradesh', country: 'India', isActive: true },
+  { id: 'c_cap_mn', name: 'Imphal', state: 'Manipur', country: 'India', isActive: true },
+  { id: 'c_cap_ml', name: 'Shillong', state: 'Meghalaya', country: 'India', isActive: true },
+  { id: 'c_cap_mz', name: 'Aizawl', state: 'Mizoram', country: 'India', isActive: true },
+  { id: 'c_cap_nl', name: 'Kohima', state: 'Nagaland', country: 'India', isActive: true },
+  { id: 'c_cap_or', name: 'Bhubaneswar', state: 'Odisha', country: 'India', isActive: true },
+  { id: 'c_cap_rj', name: 'Jaipur', state: 'Rajasthan', country: 'India', isActive: true },
+  { id: 'c_cap_sk', name: 'Gangtok', state: 'Sikkim', country: 'India', isActive: true },
+  { id: 'c_cap_tr', name: 'Agartala', state: 'Tripura', country: 'India', isActive: true },
+  { id: 'c_cap_up', name: 'Lucknow', state: 'Uttar Pradesh', country: 'India', isActive: true },
+  { id: 'c_cap_uk', name: 'Dehradun', state: 'Uttarakhand', country: 'India', isActive: true },
+
+  // 4. All Union Territories (8 UTs)
+  { id: 'c_ut_ch', name: 'Chandigarh', state: 'Chandigarh', country: 'India', isActive: true },
+  { id: 'c_ut_jk_s', name: 'Srinagar', state: 'Jammu & Kashmir', country: 'India', isActive: true },
+  { id: 'c_ut_jk_j', name: 'Jammu', state: 'Jammu & Kashmir', country: 'India', isActive: true },
+  { id: 'c_ut_la', name: 'Leh', state: 'Ladakh', country: 'India', isActive: true },
+  { id: 'c_ut_py', name: 'Puducherry', state: 'Puducherry', country: 'India', isActive: true },
+  { id: 'c_ut_an', name: 'Port Blair', state: 'Andaman & Nicobar', country: 'India', isActive: true },
+  { id: 'c_ut_dd', name: 'Daman', state: 'Daman & Diu', country: 'India', isActive: true },
+  { id: 'c_ut_ld', name: 'Kavaratti', state: 'Lakshadweep', country: 'India', isActive: true },
+
+  // 5. Major Commercial & Entertainment Metros
+  { id: 'c_hub_kochi', name: 'Kochi', state: 'Kerala', country: 'India', isActive: true },
+  { id: 'c_hub_indore', name: 'Indore', state: 'Madhya Pradesh', country: 'India', isActive: true },
+  { id: 'c_hub_surat', name: 'Surat', state: 'Gujarat', country: 'India', isActive: true },
+  { id: 'c_hub_vizag', name: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', isActive: true },
+  { id: 'c_hub_noida', name: 'Noida', state: 'Uttar Pradesh', country: 'India', isActive: true },
+  { id: 'c_hub_kanpur', name: 'Kanpur', state: 'Uttar Pradesh', country: 'India', isActive: true },
+  { id: 'c_hub_varanasi', name: 'Varanasi', state: 'Uttar Pradesh', country: 'India', isActive: true },
+  { id: 'c_hub_agra', name: 'Agra', state: 'Uttar Pradesh', country: 'India', isActive: true },
+  { id: 'c_hub_nagpur', name: 'Nagpur', state: 'Maharashtra', country: 'India', isActive: true },
+  { id: 'c_hub_coimbatore', name: 'Coimbatore', state: 'Tamil Nadu', country: 'India', isActive: true },
+  { id: 'c_hub_amritsar', name: 'Amritsar', state: 'Punjab', country: 'India', isActive: true },
+  { id: 'c_hub_ludhiana', name: 'Ludhiana', state: 'Punjab', country: 'India', isActive: true },
+  { id: 'c_hub_jodhpur', name: 'Jodhpur', state: 'Rajasthan', country: 'India', isActive: true },
+  { id: 'c_hub_udaipur', name: 'Udaipur', state: 'Rajasthan', country: 'India', isActive: true },
 ];

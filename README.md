@@ -84,6 +84,26 @@ book-my-show/
 │   │   ├── shows/                       # Shows routes, service, repo, search, schema
 │   │   └── bookings/                    # Distributed locking engine, seat map, reservations
 │   └── shared/                          # Cross-module errors and types
+├── frontend/                            # Next.js 16 + Redux Toolkit Theater & Concurrency UI
+│   ├── app/                             # Next.js App Router
+│   │   ├── layout.tsx                   # Dark & Light mode root layout with StoreProvider
+│   │   ├── page.tsx                     # BookMyShow Homepage (hero spotlight, movie cards, benchmarks)
+│   │   └── book/[showId]/page.tsx       # Dedicated cinema seat booking & concurrency test lab
+│   ├── components/                      # Adaptive Light & Dark cinema UI components
+│   │   ├── Navbar.tsx                   # Top navigation with city selector, search, theme switch
+│   │   ├── ThemeToggle.tsx              # Sun / Moon theme toggle (Obsidian Dark & Clean Light)
+│   │   ├── Header.tsx                   # Topbar with movie metadata and dynamic show switcher
+│   │   ├── TheaterScreen.tsx            # Minimal curved IMAX screen graphic with ambient light beam
+│   │   ├── SeatLegend.tsx               # Seat status visual guide
+│   │   ├── SeatGrid.tsx                 # 100-seat interactive grid (VIP, Executive, Normal)
+│   │   ├── CountdownBanner.tsx          # Real-time 8-minute TTL lock countdown ticker
+│   │   ├── ConcurrencySimulator.tsx     # In-browser 30-concurrent-user race simulator
+│   │   └── CheckoutBar.tsx              # Bottom drawer with lock action & checkout
+│   ├── store/                           # Redux Toolkit centralized state
+│   │   ├── index.ts                     # Store configuration and typed hooks
+│   │   ├── seatSlice.ts                 # Seat selection, lock TTL, and optimistic updates
+│   │   └── types.ts                     # Frontend domain types
+│   └── lib/api.ts                       # Fetch client for Fastify v5 booking endpoints
 ├── seeds/                               # Standalone database seed data files
 │   ├── cities.seed.ts                   # City records
 │   ├── cinemas.seed.ts                  # Multiplex data
@@ -281,6 +301,29 @@ Real-time Node.js heap memory usage was tracked via Prometheus (`bms_nodejs_heap
    * While initial connection handshakes saturated OS queues, persistent HTTP/1.1 Keep-Alive sockets allowed the remaining 120,000+ requests to be processed across established TCP channels with a **100.00% success rate**.
 3. **Fastify Architectural Efficiency**:
    * Fastify's Radix Trie router (`find-my-way`) and schema-compiled JSON serialization (`fast-json-stringify`) deliver **~8,000 req/s on a single core at ~40MB RAM**, outperforming traditional Express setups (~4,000 req/s) by ~2x without memory overhead.
+
+---
+
+## Frontend Architecture & Concurrency Demo UI
+
+A dedicated interactive cinema booking UI built with **Next.js 16 (App Router)**, **TailwindCSS**, and **Redux Toolkit (RTK)** to visually demonstrate distributed seat locking in action.
+
+### Key Capabilities
+
+* **Seat Layout & Categories**: 100-seat cinema hall divided into VIP (₹350), Executive (₹250), and Normal (₹150) tiers.
+* **Distributed Lock Acquisition**: Selecting seats and clicking **"Reserve Seats"** invokes `POST /api/v1/shows/:showId/lock` acquiring an atomic Redis key (`SET seat_lock:<showId>:<seatNumber> <userId> EX 480 NX`).
+* **Active 8-Minute TTL Countdown**: A real-time timer decrements every second. Once the timer reaches zero or Redis TTL expires, the lock is released automatically.
+* **In-Browser Concurrency Simulator**: Fire 30 simultaneous parallel HTTP requests against any seat directly from the UI. Visual results show the single 200 OK winner and 29 blocked requests (409 Conflict) with round-trip response times.
+* **Background Polling**: State synchronizes every 4 seconds to reflect seat locks acquired by external users in real time.
+
+### Running the Frontend
+
+```powershell
+cd frontend
+pnpm dev
+```
+
+Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 

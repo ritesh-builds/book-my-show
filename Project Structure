@@ -97,6 +97,32 @@ book-my-show/
 │       ├── errors.ts                    # AppError, NotFoundError, ConflictError, ValidationError
 │       └── types.ts                     # Global types: ApiResponse<T>, PaginatedResult<T>
 │
+├── frontend/                            # Next.js 16 + Redux Toolkit Theater & Concurrency UI
+│   ├── app/
+│   │   ├── layout.tsx                   # Dark & Light root layout with StoreProvider
+│   │   ├── page.tsx                     # BookMyShow Homepage (hero spotlight, movie cards, benchmarks)
+│   │   ├── book/[showId]/page.tsx       # Dedicated cinema seat booking & concurrency test lab
+│   │   └── StoreProvider.tsx            # Redux Provider client wrapper
+│   ├── components/
+│   │   ├── Navbar.tsx                   # Top navigation with city selector, search, theme switch
+│   │   ├── ThemeToggle.tsx              # Sun / Moon theme toggle (Obsidian Dark & Clean Light)
+│   │   ├── Header.tsx                   # Topbar with movie metadata and dynamic show switcher
+│   │   ├── TheaterScreen.tsx            # Minimal curved IMAX screen graphic with ambient light beam
+│   │   ├── SeatLegend.tsx               # Seat status visual guide (Available, Selected, Locked, Booked)
+│   │   ├── SeatGrid.tsx                 # 100-seat interactive grid (VIP, Executive, Normal)
+│   │   ├── CountdownBanner.tsx          # Real-time 8-minute TTL lock countdown ticker
+│   │   ├── ConcurrencySimulator.tsx     # In-browser 30-concurrent-user race condition tester
+│   │   └── CheckoutBar.tsx              # Bottom drawer with seat calculation & checkout
+│   ├── store/
+│   │   ├── index.ts                     # Store configuration and typed hooks
+│   │   ├── seatSlice.ts                 # Seat selection, lock TTL, and optimistic updates
+│   │   └── types.ts                     # Frontend domain types
+│   ├── lib/
+│   │   └── api.ts                       # Fetch client for Fastify v5 booking endpoints
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── next.config.ts
+│
 ├── seeds/                               # Standalone seed data folder
 │   ├── cities.seed.ts                   # Seed: Mumbai, Delhi, Bangalore, Pune, Chennai
 │   ├── cinemas.seed.ts                  # Seed: 2-3 cinemas per city

@@ -22,6 +22,10 @@ export const showsService = {
     });
   },
 
+  async getAll(): Promise<Show[]> {
+    return showsRepository.findAll();
+  },
+
   async getById(id: string): Promise<Show> {
     const show = showsRepository.findById(id);
     if (!show) throw new NotFoundError(`Show '${id}'`);

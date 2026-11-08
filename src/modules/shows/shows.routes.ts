@@ -30,6 +30,12 @@ const showsRoutes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
+  // GET /api/v1/shows — List all shows
+  fastify.get('/shows', async (_request, reply): Promise<ApiResponse<Show[]>> => {
+    const data = await showsService.getAll();
+    return reply.send({ success: true, data });
+  });
+
   // GET /api/v1/shows/:id
   fastify.get<{ Params: { id: string } }>(
     '/shows/:id',

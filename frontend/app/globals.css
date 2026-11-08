@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+  color-scheme: light dark;
+}
+
+html.dark {
+  --bg-color: #08090c;
+  --text-color: #f4f4f6;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Screen Projector Light Beam Effect */
+.projector-beam {
+  background: linear-gradient(180deg, rgba(225, 29, 72, 0.15) 0%, rgba(56, 189, 248, 0.04) 40%, transparent 100%);
+  clip-path: polygon(22% 0%, 78% 0%, 100% 100%, 0% 100%);
+}
+
+/* Subtle glowing pulse */
+@keyframes seat-pulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(225, 29, 72, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(225, 29, 72, 0.7);
+  }
+}
+
+.seat-selected-glow {
+  animation: seat-pulse 2.5s infinite ease-in-out;
+}
