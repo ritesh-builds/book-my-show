@@ -4,7 +4,7 @@ export const options = {
   scenarios: {
     seat_race_condition: {
       executor: 'per-vu-iterations',
-      vus: 200,
+      vus: 500,
       iterations: 1,
       maxDuration: '10s',
     },
