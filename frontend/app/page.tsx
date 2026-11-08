@@ -218,62 +218,63 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-12">
         
         {/* Recommended Movies Section */}
-        <section className="space-y-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <section className="space-y-5">
+          {/* Row 1: Section Title, Badge & Subtitle */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-2 border-b border-slate-200/60 dark:border-zinc-800/60">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center flex-wrap gap-2.5">
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                  <Film className="h-5 w-5 text-rose-600" />
-                  Recommended Movies in {currentCityName}
+                  <Film className="h-5 w-5 text-rose-600 shrink-0" />
+                  <span>Recommended Movies in {currentCityName}</span>
                 </h2>
-                <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50">
-                  {filteredMovies.length} Titles
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 shrink-0">
+                  {filteredMovies.length} {filteredMovies.length === 1 ? 'Title' : 'Titles'}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 flex items-center gap-1.5">
-                <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500 inline" />
-                <span>Top 25 Hot-Tier blockbusters cached in Redis RAM • Full 100-movie catalog</span>
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500 inline shrink-0" />
+                <span>Top 25 Hot-Tier blockbusters cached in Redis RAM • Full 100-Movie Catalog ({shows.length} Showtimes)</span>
               </p>
             </div>
+          </div>
 
-            {/* Search & Filter Controls */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-              {/* Instant Search Bar */}
-              <div className="relative min-w-[220px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search 100 movies..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 rounded-full text-xs bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100 border border-slate-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-500 placeholder:text-slate-400 dark:placeholder:text-zinc-500 shadow-sm"
-                />
-              </div>
+          {/* Row 2: Search Input & Category Filters */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-0.5">
+            {/* Instant Search Bar */}
+            <div className="relative w-full md:w-72 shrink-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search 100 movies..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 rounded-full text-xs bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100 border border-slate-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-500 placeholder:text-slate-400 dark:placeholder:text-zinc-500 shadow-sm transition-all"
+              />
+            </div>
 
-              {/* Filter Tabs */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-                {[
-                  { label: '🔥 Top 25 Hot (Redis)', id: 'HOT' },
-                  { label: 'All 100 Movies', id: 'ALL' },
-                  { label: 'IMAX 3D', id: 'IMAX' },
-                  { label: 'Action', id: 'ACTION' },
-                  { label: 'Drama', id: 'DRAMA' },
-                  { label: 'Punjabi', id: 'PUNJABI' },
-                ].map((filter) => (
-                  <button
-                    key={filter.id}
-                    type="button"
-                    onClick={() => setActiveFilter(filter.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium font-mono whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer ${
-                      activeFilter === filter.id
-                        ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 scale-105'
-                        : 'bg-white dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 hover:scale-102'
-                    }`}
-                  >
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
+            {/* Filter Tabs */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none touch-pan-x">
+              {[
+                { label: '🔥 Top 25 Hot (Redis)', id: 'HOT' },
+                { label: 'All 100 Movies', id: 'ALL' },
+                { label: 'IMAX 3D', id: 'IMAX' },
+                { label: 'Action', id: 'ACTION' },
+                { label: 'Drama', id: 'DRAMA' },
+                { label: 'Punjabi', id: 'PUNJABI' },
+              ].map((filter) => (
+                <button
+                  key={filter.id}
+                  type="button"
+                  onClick={() => setActiveFilter(filter.id)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium font-mono whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer shrink-0 ${
+                    activeFilter === filter.id
+                      ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 scale-102 font-bold'
+                      : 'bg-white dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 hover:text-slate-900 dark:hover:text-zinc-200'
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
             </div>
           </div>
 
