@@ -1,26 +1,15 @@
 // modules/bookings/bookings.repository.ts — In-memory & MongoDB booking data layer
 
 import type { Booking } from './bookings.types.ts';
+import { bookingsSeed, bookedSeatsSeed } from '../../../seeds/bookings.seed.ts';
 
-// In-memory confirmed bookings storage (simulating permanent DB records)
-const confirmedBookings: Booking[] = [
-  {
-    id: 'bkg_sample_1',
-    showId: 's1',
-    userId: 'user_sample',
-    seatNumbers: ['A1', 'A2'],
-    totalAmount: 900,
-    status: 'CONFIRMED',
-    paymentId: 'pay_sample_1',
-    createdAt: new Date('2024-12-01T10:00:00Z'),
-  },
-];
+// Initial confirmed bookings loaded from standalone seed data
+const confirmedBookings: Booking[] = [...bookingsSeed];
 
-// In-memory set of permanently booked seats: showId -> Set of seatNumbers
-const bookedSeatsStore = new Map<string, Set<string>>([
-  ['s1', new Set(['A1', 'A2'])],
-  ['s6', new Set(['C5', 'C6', 'C7'])],
-]);
+// In-memory set of permanently booked seats initialized from seed: showId -> Set of seatNumbers
+const bookedSeatsStore = new Map<string, Set<string>>(
+  bookedSeatsSeed.map(item => [item.showId, new Set<string>(item.bookedSeats)])
+);
 
 export const bookingsRepository = {
   /**

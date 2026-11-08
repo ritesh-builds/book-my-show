@@ -1,5 +1,7 @@
 // scripts/health-check.ts — Quick server health check
 
+export {};
+
 const BASE_URL = process.env['SERVER_URL'] ?? 'http://localhost:3000';
 
 async function checkHealth(): Promise<void> {

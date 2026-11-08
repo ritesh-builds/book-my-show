@@ -1,8 +1,4 @@
 import http from 'k6/http';
-import { check } from 'k6';
-
-// Concurrency Test: 200 Virtual Users try to lock the EXACT SAME SEAT (A1) at the same millisecond!
-// Expected Result: Exactly 1 user gets 200 OK, 199 users get 409 Conflict (Double Booking Blocked).
 
 export const options = {
   scenarios: {
@@ -16,22 +12,26 @@ export const options = {
 };
 
 export default function () {
+  // Har baar naye seat test ke liye (jaise B6)
   const url = 'http://localhost:3000/api/v1/shows/s1/lock';
+  const userId = `User_${__VU}`;
   const payload = JSON.stringify({
-    seatNumbers: ['A1'],
-    userId: `user_vu_${__VU}`,
+    seatNumbers: ['B6'], // ◄── New vacant seat B6
+    userId: userId,
   });
 
   const params = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
   };
 
   const res = http.post(url, payload, params);
 
-  check(res, {
-    'Is 200 (Winner) or 409 (Blocked)': (r) => r.status === 200 || r.status === 409,
-  });
+  // SAATH-SAATH TERMINAL PAR DEKHO:
+  if (res.status === 200) {
+    console.log(`\n🏆 WINNER: ${userId} successfully locked seat B6! (Status 200 OK)\n`);
+  } else if (res.status === 409) {
+    // Agar sabka print karenge toh 199 lines aayengi, isliye bas check confirm hai
+  } else {
+    console.log(`❌ ERROR: ${userId} got unexpected status ${res.status}`);
+  }
 }
-

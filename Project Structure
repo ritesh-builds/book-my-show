@@ -5,12 +5,15 @@
 |-------|--------|
 | Runtime | Node.js 22+ (LTS) |
 | Framework | Fastify v5 |
-| Language | TypeScript 7 (Go-based compiler) |
-| Validation | Zod |
-| Database | MongoDB |
-| Cache | Redis |
-| Search | Elasticsearch |
+| Language | TypeScript 5.x |
+| Validation | Zod 3 |
+| Database | MongoDB 7 |
+| Cache & Locks | Redis 7 (Distributed Locking Engine) |
+| Search | Elasticsearch 8.15 |
+| Observability | Prometheus & Grafana (`prom-client 15`) |
+| Bundler | esbuild |
 | Linter | Oxlint |
+| Load Testing | Grafana k6 |
 | Auth | JWT |
 
 ---
@@ -33,9 +36,10 @@ book-my-show/
 │   │   ├── mongodb.ts                   # MongoDB connect + graceful close
 │   │   ├── redis.ts                     # Redis connect + graceful close
 │   │   ├── elasticsearch.ts             # ES client connect + graceful close
-│   │   ├── routes.ts                    # Register all module routes
-│   │   ├── error-handler.ts             # Global error response handler
-│   │   └── telemetry.ts                 # Placeholder (OpenTelemetry baad mein)
+│   │   ├── metrics.ts                   # Prometheus metrics registration (/metrics)
+│   │   ├── telemetry.ts                 # Runtime performance telemetry
+│   │   ├── routes.ts                    # Register all module routes (cities, cinemas, shows, bookings)
+│   │   └── error-handler.ts             # Global error response handler
 │   │
 │   ├── config/
 │   │   └── env.ts                       # Zod-validated env vars (PORT, HOST, MONGODB_URI, REDIS_URL, ES_URL, JWT_SECRET, CORS_ORIGINS)
@@ -48,19 +52,19 @@ book-my-show/
 │   ├── integrations/                    # Third-party service wrappers
 │   │   ├── index.ts                     # Re-exports all integrations
 │   │   ├── messaging/
-│   │   │   ├── email.ts                 # Nodemailer / SendGrid wrapper
-│   │   │   └── whatsapp.ts              # WhatsApp Business API wrapper
+│   │   │   ├── email.ts                 # Nodemailer wrapper
+│   │   │   └── whatsapp.ts              # WhatsApp Cloud API wrapper
 │   │   ├── auth/
 │   │   │   └── jwt.ts                   # JWT sign, verify, refresh helpers
 │   │   └── payments/
-│   │       └── razorpay.ts              # Razorpay wrapper (future)
+│   │       └── razorpay.ts              # Razorpay order creation & HMAC verification
 │   │
 │   ├── modules/                         # Feature modules (domain-driven)
 │   │   │
 │   │   ├── cities/
 │   │   │   ├── cities.types.ts          # TS interfaces: City, CityId, etc.
 │   │   │   ├── cities.schema.ts         # Zod schemas: request + response validation
-│   │   │   ├── cities.repository.ts     # Data access: MongoDB queries (in-memory now)
+│   │   │   ├── cities.repository.ts     # Data access: MongoDB queries / in-memory fallback
 │   │   │   ├── cities.cache.ts          # Redis: cache get/set for cities list
 │   │   │   ├── cities.service.ts        # Business logic: calls repo + cache
 │   │   │   └── cities.routes.ts         # Fastify handlers: GET /cities, GET /cities/:id
@@ -73,47 +77,58 @@ book-my-show/
 │   │   │   ├── cinemas.service.ts
 │   │   │   └── cinemas.routes.ts        # GET /cities/:cityId/cinemas, GET /cinemas/:id
 │   │   │
-│   │   └── shows/
-│   │       ├── shows.types.ts
-│   │       ├── shows.schema.ts
-│   │       ├── shows.repository.ts
-│   │       ├── shows.search.ts          # Elasticsearch: full-text show/movie search
-│   │       ├── shows.service.ts
-│   │       └── shows.routes.ts          # GET /cinemas/:cinemaId/shows, GET /shows/:id
+│   │   ├── shows/
+│   │   │   ├── shows.types.ts
+│   │   │   ├── shows.schema.ts
+│   │   │   ├── shows.repository.ts
+│   │   │   ├── shows.search.ts          # Elasticsearch: full-text show/movie search
+│   │   │   ├── shows.service.ts
+│   │   │   └── shows.routes.ts          # GET /cinemas/:cinemaId/shows, GET /shows/:id
+│   │   │
+│   │   └── bookings/                    # Distributed locking & seat concurrency engine
+│   │       ├── bookings.types.ts        # Seat, SeatStatus ('AVAILABLE'|'LOCKED'|'BOOKED'), Booking
+│   │       ├── bookings.schema.ts       # Zod validation: LockSeatsSchema, ConfirmBookingSchema
+│   │       ├── bookings.lock.ts         # Redis atomic lock (SET NX EX 480) with rollback
+│   │       ├── bookings.repository.ts   # Confirmed bookings store & booked seats registry
+│   │       ├── bookings.service.ts      # Seat map generation, atomic lock, confirm booking
+│   │       └── bookings.routes.ts       # GET /shows/:id/seats, POST /shows/:id/lock, POST /bookings/confirm
 │   │
 │   └── shared/                          # Cross-module shared code
-│       ├── errors.ts                    # AppError, NotFoundError, ValidationError classes
+│       ├── errors.ts                    # AppError, NotFoundError, ConflictError, ValidationError
 │       └── types.ts                     # Global types: ApiResponse<T>, PaginatedResult<T>
 │
 ├── seeds/                               # Standalone seed data folder
 │   ├── cities.seed.ts                   # Seed: Mumbai, Delhi, Bangalore, Pune, Chennai
 │   ├── cinemas.seed.ts                  # Seed: 2-3 cinemas per city
 │   ├── shows.seed.ts                    # Seed: shows with movie, timing, screen
+│   ├── bookings.seed.ts                 # Seed: pre-occupied seats and sample booking records
 │   └── index.ts                         # Run all seeds in order
 │
 ├── docker/
-│   ├── docker-compose.yml               # Local dev: MongoDB + Redis + Elasticsearch + Nginx
-│   ├── docker-compose.prod.yml          # Prod overrides
+│   ├── docker-compose.yml               # Local dev: MongoDB + Redis + Elasticsearch + Prometheus + Grafana
+│   ├── grafana/
+│   │   └── provisioning/
+│   │       └── datasources/
+│   │           └── datasource.yml       # Auto-provisioned Prometheus data source
+│   ├── prometheus/
+│   │   └── prometheus.yml               # Scrapes Fastify /metrics every 5 seconds
 │   ├── mongodb/
 │   │   └── mongo-init.js                # MongoDB init script (create DB + user + indexes)
-│   ├── redis/
-│   │   └── redis.conf                   # Custom Redis config (AOF, memory, LRU)
-│   └── nginx/
-│       └── nginx.conf                   # Nginx reverse proxy, rate limiting, and gzip
+│   └── redis/
+│       └── redis.conf                   # Custom Redis config (AOF, memory, LRU)
 │
 ├── scripts/
-│   ├── seed.ts                          # npm run seed → runs seeds/index.ts
-│   ├── health-check.ts                  # Quick server alive check
-│   └── generate-module.ts               # Future: scaffold new module boilerplate
+│   ├── seed.ts                          # pnpm seed → runs seeds/index.ts
+│   ├── health-check.ts                  # Microservice health prober
+│   └── load-testing/                    # k6 high-throughput performance scripts
+│       ├── 1.api-test.js                # Concurrency & latency stress script (~8k req/s)
+│       └── 2.seat-lock-race.js          # 200 VUs seat locking race condition benchmark
 │
 ├── test/
 │   ├── health.test.ts                   # GET /health smoke test
 │   └── cities.test.ts                   # Cities API unit + integration tests
 │
-├── logs/                                # Auto-generated at runtime (gitignored)
-│   ├── app.log
-│   └── error.log
-│
+├── dist/                                # Bundled esbuild output (server.js) for cluster deployment
 ├── Dockerfile                           # Production Docker image
 ├── .dockerignore                        # Docker build ignore rules
 ├── package.json
@@ -128,45 +143,22 @@ book-my-show/
 
 ---
 
-## Data Flow per Request
+## API Endpoints (Complete)
 
-```
-HTTP Request
-    │
-    ▼
-routes.ts (Fastify handler)
-    │  validates via Zod schema
-    ▼
-service.ts (business logic)
-    │  checks cache first
-    ▼
-cache.ts ──── HIT ──▶ return cached data
-    │
-   MISS
-    │
-    ▼
-repository.ts (data access)
-    │  queries MongoDB / in-memory
-    ▼
-service.ts (format response)
-    │  sets cache
-    ▼
-HTTP Response (via shared/types.ts ApiResponse<T>)
-```
-
----
-
-## API Endpoints (Phase 1)
-
-| Method | Endpoint | Module |
-|--------|----------|--------|
-| GET | `/health` | bootstrap |
-| GET | `/api/v1/cities` | cities |
-| GET | `/api/v1/cities/:id` | cities |
-| GET | `/api/v1/cities/:cityId/cinemas` | cinemas |
-| GET | `/api/v1/cinemas/:id` | cinemas |
-| GET | `/api/v1/cinemas/:cinemaId/shows` | shows |
-| GET | `/api/v1/shows/:id` | shows |
+| Method | Endpoint | Module | Description |
+|--------|----------|--------|-------------|
+| GET | `/health` | bootstrap | Server uptime and health check |
+| GET | `/metrics` | bootstrap | Prometheus runtime & HTTP metrics |
+| GET | `/docs` | bootstrap | Swagger UI interactive API docs |
+| GET | `/api/v1/cities` | cities | List active cities |
+| GET | `/api/v1/cities/:id` | cities | Get single city details |
+| GET | `/api/v1/cities/:cityId/cinemas` | cinemas | List cinemas in a city |
+| GET | `/api/v1/cinemas/:id` | cinemas | Get single cinema details |
+| GET | `/api/v1/cinemas/:cinemaId/shows` | shows | List shows running in a cinema |
+| GET | `/api/v1/shows/:id` | shows | Get show details, pricing & availability |
+| GET | `/api/v1/shows/:showId/seats` | bookings | Live seat map (Available / Locked / Booked) |
+| POST | `/api/v1/shows/:showId/lock` | bookings | Atomic distributed seat reservation (8-min TTL) |
+| POST | `/api/v1/bookings/confirm` | bookings | Payment signature verification & DB commit |
 
 ---
 
@@ -176,6 +168,7 @@ HTTP Response (via shared/types.ts ApiResponse<T>)
 {
   "dev":          "node --watch --experimental-strip-types src/server.ts",
   "start":        "node --experimental-strip-types src/server.ts",
+  "build":        "esbuild src/server.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/server.js",
   "typecheck":    "tsc --noEmit",
   "lint":         "oxlint src/",
   "test":         "node --experimental-strip-types --test test/**/*.test.ts",
@@ -184,7 +177,3 @@ HTTP Response (via shared/types.ts ApiResponse<T>)
   "docker:down":  "docker compose -f docker/docker-compose.yml down"
 }
 ```
-
----
-
-> **"Go"** bolo to sab files ek saath create karta hoon.

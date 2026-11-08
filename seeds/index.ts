@@ -3,6 +3,7 @@
 import { citiesSeed } from './cities.seed.ts';
 import { cinemasSeed } from './cinemas.seed.ts';
 import { showsSeed } from './shows.seed.ts';
+import { bookedSeatsSeed, bookingsSeed } from './bookings.seed.ts';
 
 export async function runSeeds(): Promise<void> {
   console.log('Running seeds...');
@@ -20,6 +21,8 @@ export async function runSeeds(): Promise<void> {
   console.log(`Cities to seed: ${citiesSeed.length}`);
   console.log(`Cinemas to seed: ${cinemasSeed.length}`);
   console.log(`Shows to seed: ${showsSeed.length}`);
+  console.log(`Booked seat shows to seed: ${bookedSeatsSeed.length}`);
+  console.log(`Initial confirmed bookings: ${bookingsSeed.length}`);
   console.log('Seed data ready. Connect MongoDB and uncomment insertion logic.');
 }
 
